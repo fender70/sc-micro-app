@@ -4,8 +4,14 @@ import { FiHome, FiPlus, FiUsers, FiUpload, FiUserCheck, FiFolderPlus } from 're
 import ThemeToggle from './ThemeToggle';
 import './Header.css';
 
+// Import your logo here (uncomment and adjust the path when you add the logo)
+// import logoImage from '../assets/logo.png';
+
 const Header = () => {
   const location = useLocation();
+  
+  // Set this to true when you have the logo file
+  const hasLogo = false; // Change to true when logo is added
 
   return (
     <header className="header">
@@ -14,7 +20,15 @@ const Header = () => {
           <div className="header-brand">
             <Link to="/" className="brand-link">
               <div className="brand-logo">
-                <div className="logo-placeholder">SC</div>
+                {hasLogo ? (
+                  <img 
+                    src="/logo.png" 
+                    alt="SC Micro Logo" 
+                    className="logo-image"
+                  />
+                ) : (
+                  <div className="logo-placeholder">SC</div>
+                )}
               </div>
               <h1 className="brand-title">SC Micro</h1>
             </Link>
