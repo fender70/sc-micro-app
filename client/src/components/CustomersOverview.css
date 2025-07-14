@@ -71,7 +71,7 @@
   justify-content: center;
   font-size: 1.5rem;
   color: white;
-  background: linear-gradient(135deg, var(--primary-color), #667eea);
+  background: var(--primary-color);
   flex-shrink: 0;
 }
 

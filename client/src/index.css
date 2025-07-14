@@ -6,9 +6,9 @@
 
 :root {
   /* Light theme variables */
-  --primary-color: #D4AF37;
-  --primary-hover: #B8941F;
-  --primary-dark: #8B6914;
+  --primary-color: #B8941F;
+  --primary-hover: #8B6914;
+  --primary-dark: #6B4F0F;
   --secondary-color: #6B7280;
   --success-color: #059669;
   --warning-color: #D97706;
@@ -43,6 +43,11 @@
 
 /* Dark theme */
 [data-theme="dark"] {
+  /* Dark theme primary colors - brighter for better contrast */
+  --primary-color: #D4AF37;
+  --primary-hover: #E5C158;
+  --primary-dark: #B8941F;
+  
   /* Dark theme backgrounds */
   --background-color: #0F0F0F;
   --surface-color: #1A1A1A;
