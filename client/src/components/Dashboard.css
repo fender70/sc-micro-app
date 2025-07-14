@@ -156,8 +156,8 @@
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -165,10 +165,10 @@
   background: var(--gradient-card);
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
-  padding: 0.75rem;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   transition: all 0.3s ease;
 }
 
@@ -202,13 +202,13 @@
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
+  width: 28px;
+  height: 28px;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1rem;
   color: white;
   background: var(--gradient-stat);
   flex-shrink: 0;
@@ -220,7 +220,7 @@
 }
 
 .stat-number {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   background: var(--gradient-text);
   -webkit-background-clip: text;
@@ -233,7 +233,7 @@
 
 .stat-label {
   color: var(--text-secondary);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 500;
 }
 
@@ -640,7 +640,7 @@
   }
   
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
   }
   
   .projects-container.grid,
