@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   FiUsers, 
   FiTrendingUp, 
@@ -17,6 +17,7 @@ import {
 import './CustomersOverview.css';
 
 const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
@@ -171,10 +172,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
             <button 
               className="btn-icon" 
               title="Edit Customer"
-              onClick={() => {
-                // TODO: Implement customer edit functionality
-                alert('Customer edit functionality coming soon!');
-              }}
+              onClick={() => navigate(`/edit-customer/${customer._id}`)}
             >
               <FiEdit />
             </button>

@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import WorkRequestForm from './components/WorkRequestForm';
 import WorkRequestEditForm from './components/WorkRequestEditForm';
 import CustomerForm from './components/CustomerForm';
+import CustomerEditForm from './components/CustomerEditForm';
 import ProjectForm from './components/ProjectForm';
 import ProjectEditForm from './components/ProjectEditForm';
 import CSVUpload from './components/CSVUpload';
@@ -81,6 +82,19 @@ function App() {
       return response.data;
     } catch (error) {
       console.error('Error adding customer:', error);
+      throw error;
+    }
+  };
+
+  const updateCustomer = async (id, customerData) => {
+    try {
+      const response = await axios.put(`/api/customers/${id}`, customerData);
+      setCustomers(customers.map(c => 
+        c._id === id ? response.data : c
+      ));
+      return response.data;
+    } catch (error) {
+      console.error('Error updating customer:', error);
       throw error;
     }
   };
@@ -183,6 +197,15 @@ function App() {
               element={
                 <CustomerForm 
                   onSubmit={addCustomer}
+                />
+              } 
+            />
+            <Route 
+              path="/edit-customer/:id" 
+              element={
+                <CustomerEditForm 
+                  customers={customers}
+                  onUpdateCustomer={updateCustomer}
                 />
               } 
             />
