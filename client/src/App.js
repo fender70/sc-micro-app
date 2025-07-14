@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import WorkRequestForm from './components/WorkRequestForm';
 import CustomerForm from './components/CustomerForm';
 import CSVUpload from './components/CSVUpload';
+import CustomersOverview from './components/CustomersOverview';
 import './App.css';
 
 function App() {
@@ -101,6 +102,16 @@ function App() {
                   customers={customers}
                   onUpdateWorkRequest={updateWorkRequest}
                   onDeleteWorkRequest={deleteWorkRequest}
+                  onRefresh={fetchData}
+                />
+              } 
+            />
+            <Route 
+              path="/customers" 
+              element={
+                <CustomersOverview 
+                  customers={customers}
+                  workRequests={workRequests}
                   onRefresh={fetchData}
                 />
               } 
