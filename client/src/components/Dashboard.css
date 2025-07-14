@@ -22,7 +22,11 @@
 .dashboard-title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--text-primary);
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
   margin: 0;
 }
 
@@ -216,7 +220,11 @@
 .stat-number {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--text-primary);
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
   line-height: 1;
   margin-bottom: 0.25rem;
 }

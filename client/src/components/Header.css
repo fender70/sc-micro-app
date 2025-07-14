@@ -61,7 +61,11 @@
 .brand-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary-color);
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
   margin: 0;
 }
 
