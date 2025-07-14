@@ -75,6 +75,13 @@
   height: 1.25rem;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;

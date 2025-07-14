@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiHome, FiPlus, FiUsers, FiUpload, FiUserCheck, FiFolderPlus } from 'react-icons/fi';
+import ThemeToggle from './ThemeToggle';
 import './Header.css';
 
 const Header = () => {
@@ -65,6 +66,10 @@ const Header = () => {
               <FiUpload />
               <span>CSV Upload</span>
             </Link>
+            
+            <div className="header-actions">
+              <ThemeToggle />
+            </div>
           </nav>
         </div>
       </div>

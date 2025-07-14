@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import WorkRequestForm from './components/WorkRequestForm';
@@ -144,11 +145,12 @@ function App() {
   }
 
   return (
-    <Router>
-      <div className="App">
-        <Header />
-        <main className="main-content">
-          <Routes>
+    <ThemeProvider>
+      <Router>
+        <div className="App">
+          <Header />
+          <main className="main-content">
+            <Routes>
             <Route 
               path="/" 
               element={
@@ -247,10 +249,11 @@ function App() {
                 />
               } 
             />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+                      </Routes>
+          </main>
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 
