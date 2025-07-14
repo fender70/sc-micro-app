@@ -36,7 +36,7 @@ const WorkRequestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'in-progress', 'completed', 'shipped'],
+    enum: ['pending', 'in-progress', 'completed', 'shipped', 'quoted', 'po-received', 'payment', 'cancelled'],
     default: 'pending'
   },
   createdAt: {

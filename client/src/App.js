@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import WorkRequestForm from './components/WorkRequestForm';
 import CustomerForm from './components/CustomerForm';
+import CSVUpload from './components/CSVUpload';
 import './App.css';
 
 function App() {
@@ -118,6 +119,14 @@ function App() {
               element={
                 <CustomerForm 
                   onSubmit={addCustomer}
+                />
+              } 
+            />
+            <Route 
+              path="/csv-upload" 
+              element={
+                <CSVUpload 
+                  onUploadSuccess={fetchData}
                 />
               } 
             />
