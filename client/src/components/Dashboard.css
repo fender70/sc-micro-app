@@ -499,9 +499,9 @@
 
 .btn-delete {
   padding: 0.5rem 1rem;
-  border: 1px solid #ef4444;
-  background: transparent;
-  color: #ef4444;
+  background: #ef4444;
+  color: white;
+  border: none;
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -509,8 +509,7 @@
 }
 
 .btn-delete:hover {
-  background: #ef4444;
-  color: white;
+  background: #dc2626;
 }
 
 /* Work Requests Container */

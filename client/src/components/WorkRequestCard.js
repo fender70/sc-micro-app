@@ -40,7 +40,7 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
     <div className="work-request-card">
       <div className="work-request-header">
         <div className="work-request-title">
-          Project for {workRequest.customer?.company || workRequest.customer?.name || 'Unknown Company'}
+          {workRequest.customer?.company || workRequest.customer?.name || 'Unknown Company'}
         </div>
         <div className="work-request-customer">
           {workRequest.customer?.name}
