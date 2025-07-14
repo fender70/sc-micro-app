@@ -162,7 +162,7 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
           </Link>
           <button 
             onClick={() => onDelete(workRequest._id)}
-            className="btn btn-danger btn-sm"
+            className="btn-delete"
             title="Delete work request"
           >
             <FiTrash2 />
