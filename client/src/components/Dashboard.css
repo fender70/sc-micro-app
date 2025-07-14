@@ -209,8 +209,9 @@
   justify-content: center;
   font-size: 1.5rem;
   color: white;
-  background: var(--primary-color);
+  background: var(--gradient-stat);
   flex-shrink: 0;
+  box-shadow: var(--shadow-md);
 }
 
 .stat-content {
