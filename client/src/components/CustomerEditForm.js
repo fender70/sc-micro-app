@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiSave, FiX, FiUser, FiMail, FiPhone, FiMapPin, FiBuilding } from 'react-icons/fi';
+import { FiSave, FiX, FiUser, FiMail, FiPhone, FiMapPin, FiHome } from 'react-icons/fi';
 import './CustomerEditForm.css';
 
 const CustomerEditForm = ({ customers, onUpdateCustomer }) => {
@@ -122,7 +122,7 @@ const CustomerEditForm = ({ customers, onUpdateCustomer }) => {
 
             <div className="form-group">
               <label htmlFor="company">
-                <FiBuilding />
+                <FiHome />
                 Company Name
               </label>
               <input
