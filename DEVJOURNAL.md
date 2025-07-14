@@ -82,9 +82,59 @@
 
 ---
 
+## 2024-04-20 — Customer Overview & Relationship Management
+
+### Challenge: Customer-Centric Business Intelligence
+- Needed a dedicated view for customer relationship management and business insights.
+- Required metrics that would be valuable for SC Micro's business operations.
+- Solution: Created comprehensive customer overview with customer tiering, project analytics, and business metrics.
+- Learned: Business intelligence features need to align with actual business needs and workflows.
+
+### Challenge: Customer Value Scoring
+- Needed to create a system to identify high-value customers and prioritize relationships.
+- Solution: Implemented customer tiering system (Premium, Gold, Silver, Bronze) based on project count, completion rate, and revenue.
+- Added customer value scoring algorithm that considers multiple factors.
+- Learned: Customer segmentation helps focus business development efforts.
+
+### Challenge: Project Type Analytics
+- Needed to understand what types of services customers are using most.
+- Solution: Created project type detection (wirebond, die attach, flip chip, encapsulation) from work request details.
+- Added visual project type breakdown for each customer.
+- Learned: Service analytics help identify business opportunities and customer needs.
+
+### Challenge: Customer Performance Metrics
+- Needed meaningful metrics for customer relationship management.
+- Solution: Added completion rates, average project time, last activity tracking, and revenue metrics.
+- Created customer comparison capabilities through sorting and filtering.
+- Learned: Performance metrics help identify customer satisfaction and business opportunities.
+
+### Challenge: Business-Relevant Filtering
+- Needed filtering options that make sense for business operations.
+- Solution: Added filters for active customers, completed projects, inactive customers, and various sorting options.
+- Implemented search across customer names, companies, and contact information.
+- Learned: Business filtering should match how users actually think about their data.
+
+### Challenge: Customer Relationship Context
+- Needed to show customer contact information and notes in a useful way.
+- Solution: Created customer cards with contact details, location information, and notes display.
+- Added quick action buttons for viewing details and editing customers.
+- Learned: Context is crucial for relationship management - users need to see all relevant information at a glance.
+
+### General Lessons
+- Customer relationship management features need to provide actionable business insights.
+- Customer tiering and value scoring help prioritize business development efforts.
+- Service analytics reveal business opportunities and customer needs.
+- Performance metrics help identify customer satisfaction and areas for improvement.
+- Business intelligence should align with actual business workflows and decision-making processes.
+
+---
+
 ## Next Steps
 - Add more tracker rows to seed data if needed
 - Continue to test with real CSVs from users
 - Consider adding project timeline/calendar view
 - Add export functionality for project reports
+- Implement customer communication history tracking
+- Add customer satisfaction surveys and feedback
+- Consider adding customer portal for self-service
 - Keep DEVJOURNAL updated with new challenges and solutions 
