@@ -17,13 +17,20 @@
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.work-request-info {
+  flex: 1;
 }
 
 .work-request-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.25rem;
   line-height: 1.4;
   word-wrap: break-word;
 }
@@ -31,7 +38,6 @@
 .work-request-customer {
   color: var(--text-secondary);
   font-size: 0.875rem;
-  margin-bottom: 2rem;
   font-weight: 500;
 }
 

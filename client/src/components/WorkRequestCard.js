@@ -39,11 +39,13 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
   return (
     <div className="work-request-card">
       <div className="work-request-header">
-        <div className="work-request-title">
-          {workRequest.customer?.company || workRequest.customer?.name || 'Unknown Company'}
-        </div>
-        <div className="work-request-customer">
-          {workRequest.customer?.name}
+        <div className="work-request-info">
+          <div className="work-request-title">
+            {workRequest.customer?.company || workRequest.customer?.name || 'Unknown Company'}
+          </div>
+          <div className="work-request-customer">
+            {workRequest.customer?.name}
+          </div>
         </div>
         <div className="work-request-status">
           {isEditing ? (
