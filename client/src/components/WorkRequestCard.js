@@ -40,13 +40,10 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
     <div className="work-request-card">
       <div className="work-request-header">
         <div className="work-request-title">
-          {workRequest.workRequestDetails.length > 50 
-            ? `${workRequest.workRequestDetails.substring(0, 50)}...`
-            : workRequest.workRequestDetails
-          }
+          Project for {workRequest.customer?.company || workRequest.customer?.name || 'Unknown Company'}
         </div>
         <div className="work-request-customer">
-          {workRequest.customer?.name} {workRequest.customer?.company && `• ${workRequest.customer.company}`}
+          {workRequest.customer?.name}
         </div>
         <div className="work-request-status">
           {isEditing ? (
