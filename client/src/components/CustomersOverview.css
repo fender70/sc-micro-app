@@ -294,19 +294,20 @@
 
 .metric-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
 }
 
 .metric {
   text-align: center;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background: var(--bg-secondary);
   border-radius: 0.5rem;
+  min-width: 0;
 }
 
 .metric-number {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1;

@@ -24,9 +24,6 @@
 }
 
 .work-request-form {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
   padding: 2rem;
 }
 
