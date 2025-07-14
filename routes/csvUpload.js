@@ -193,10 +193,10 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 
               try {
                 // Validate required fields for projects
-                if (!row['Customer'] || !row['Project Name']) {
+                if (!row['Customer'] || !row['Project Information']) {
                   errors.push({
                     row: i + 1,
-                    error: 'Missing required fields: Customer and Project Name are required'
+                    error: 'Missing required fields: Customer and Project Information are required'
                   });
                   continue;
                 }
@@ -211,37 +211,65 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 
                 if (!customer) {
                   customer = new Customer({
-                    name: row['Customer'],
-                    email: `${row['Customer'].toLowerCase().replace(/\s+/g, '.')}@company.com`,
+                    name: row['PIC Name'] || row['Customer'],
+                    email: `${(row['PIC Name'] || row['Customer']).toLowerCase().replace(/\s+/g, '.')}@company.com`,
                     phone: '',
                     company: row['Customer'],
                     address: {},
-                    notes: ''
+                    notes: row['Comments'] || ''
                   });
                   await customer.save();
                 }
 
-                // Map project status
-                const status = mapProjectStatus(row['Status'] || 'planning');
-                const projectType = mapProjectType(row['Project Type'] || 'other');
-                const priority = row['Priority']?.toLowerCase() || 'medium';
+                // Determine project type from project information
+                const projectInfo = (row['Project Information'] || '').toLowerCase();
+                let projectType = 'other';
+                if (projectInfo.includes('wirebond') || projectInfo.includes('wire bond')) {
+                  projectType = 'wirebond';
+                } else if (projectInfo.includes('die attach') || projectInfo.includes('dieattach')) {
+                  projectType = 'die-attach';
+                } else if (projectInfo.includes('flip chip') || projectInfo.includes('flipchip')) {
+                  projectType = 'flip-chip';
+                } else if (projectInfo.includes('encapsulation')) {
+                  projectType = 'encapsulation';
+                } else if (projectInfo.includes('assembly')) {
+                  projectType = 'assembly';
+                }
+
+                // Determine status based on completion date and invoice
+                let status = 'planning';
+                if (row['Completion Date'] && row['Completion Date'].trim() !== '') {
+                  status = 'completed';
+                } else if (row['Invoice #'] && row['Invoice #'].trim() !== '') {
+                  status = 'active';
+                } else if (row['Quote #'] && row['Quote #'].trim() !== '') {
+                  status = 'active';
+                }
+
+                // Parse amount invoiced
+                const amountInvoiced = row['Amount Invoiced ($)'] 
+                  ? parseFloat(row['Amount Invoiced ($)'].replace(/[$,]/g, '')) 
+                  : 0;
 
                 // Create project
                 const project = new Project({
                   customer: customer._id,
-                  projectName: row['Project Name'],
-                  projectDescription: row['Description'] || '',
+                  projectName: `Project ${row['SN'] || 'Unknown'} - ${row['Customer']}`,
+                  projectDescription: row['Project Information'] || '',
                   projectType: projectType,
                   status: status,
-                  priority: priority,
-                  startDate: row['Start Date'] ? new Date(row['Start Date']) : null,
-                  targetDate: row['Target Date'] ? new Date(row['Target Date']) : null,
-                  budget: parseFloat(row['Budget']) || 0,
+                  priority: 'medium',
+                  startDate: null, // Not provided in this format
+                  targetDate: null, // Not provided in this format
+                  completionDate: row['Completion Date'] ? new Date(row['Completion Date']) : null,
+                  budget: amountInvoiced,
+                  actualCost: amountInvoiced,
                   quoteNumber: row['Quote #'] || '',
-                  poNumber: row['PO #'] || '',
-                  projectManager: row['Project Manager'] || '',
-                  technicalLead: row['Technical Lead'] || '',
-                  notes: row['Notes'] || ''
+                  poNumber: row['PO#'] || '',
+                  invoiceNumber: row['Invoice #'] || '',
+                  projectManager: row['PIC Name'] || '',
+                  technicalLead: '',
+                  notes: row['Comments'] || ''
                 });
 
                 await project.save();
@@ -301,11 +329,73 @@ router.get('/template', (req, res) => {
   let filename = '';
   
   if (type === 'projects') {
-    csvTemplate = `Customer,Project Name,Description,Project Type,Status,Priority,Start Date,Target Date,Budget,Quote #,PO #,Project Manager,Technical Lead,Notes
-"SC Micro Systems","Wirebond Assembly Project","High-precision wirebond assembly for sensor modules","wirebond","active","high","2024-01-15","2024-03-15","50000","Q-2024-001","PO-2024-001","John Smith","Dr. Johnson","Critical project for aerospace client"
-"One Health Biosensing","Die Attach Development","Development of new die attach process for medical devices","die-attach","planning","medium","2024-02-01","2024-04-01","30000","Q-2024-002","","Jane Doe","Dr. Williams","Medical device certification required"
-"Sutter Hybrids","Flip Chip Assembly","Flip chip assembly for automotive applications","flip-chip","active","high","2024-01-20","2024-02-20","75000","Q-2024-003","PO-2024-002","Mike Brown","Sarah Wilson","Automotive grade requirements"
-"CSpeed","Encapsulation Testing","Testing of new encapsulation materials","encapsulation","on-hold","low","2024-03-01","2024-05-01","15000","Q-2024-004","","Lisa Chen","Tom Davis","Waiting for material approval"`;
+    csvTemplate = `SN,Customer,PIC Name,Quote #,PO#,Invoice #,Amount Invoiced ($),Completion Date,Photo,Project Information,Comments
+157,Open Light Photonics,Sheri Wang,QU-24733,INV-2536,INV-2536,"4,965.94",7-Jun,,"Manual remove the singulated die from wafer
+Die attach with JM7000 (need to purchase)
+Wirebond with 8 wires
+Quantity: 100","QU24733
+They asked if you can include the price of the epoxy on the quote. I already have a quote on that epoxy.
+Please find the attached quote from bond source"
+150,Qorvo,James Wang,QU-24732,,,,,,"Eutectic die attach
+They will provide the die and heat spreader
+Temperature: 340C
+Quote Request for 100 and 200 quantity
+Schedule:  End of April","QU-24732
+This needs to be updated the quote. Only eutectic attach without wirebond"
+160,Semi Pac Reclaim,John Mackay,QU-24730,,INV-2521,"3,030.17",4/17/2025,,"Wirebond project. No Die attach
+Materials are on-hand.
+23 wires
+Quantity: 147","QU-24730
+Completed project and collected
+Need to revise the quote with only 18 wires Wirebonded (top die)
+For Payment"
+78,AMRF,Qianli Mu,QU-24696,,,,,,"Total number of Assembly – 4
+Total number of PCB – 3
+Total number of chip – 4
+Quantity – 5 each
+Total number of wirebond – 12-42",Need to update the quote based on the new information provided (attached file)
+163,Cornel University,Jaeyun Moon,QU-24736,,,,,,"Wirebond 2 Devices Al wire
+Device 1 – 9 wires
+Device 2 – 6 wires",
+135,UC Berkeley,Lian Zhou,QU-24718,,,,,,"Photonics chip: 28x5mm
+PCB: 61x65mm
+Quantity: 1
+# of Wires: 8",Request for discount for the NRE Fee
+164,Northrop Grumman Corp,Philip Hon,,,,,,,"Solder Ball Flip Chip
+What is the smallest solder ball and pitch we have?",Request for quote for quantity 1 and quantity 10
+165,University of Texas (Dallas),Naeeme Modir,,,,,,,"Die Attach with conductive epoxy
+Substrate Material: ENIG
+Size of LED: 300-400 um 
+Chip Thickness: 85-200 um 
+Total Wire #: 76
+Encapsulation",Request for quote for quantity of 1
+180,WUSTL.EDU,"Undavalli, Aswin Chowdary",QU-24753,,,,,,"Wirebond total of 5 boards
+- 3 boards with encapsulation
+- 2 boards with no encapsulation
+
+Total of wirebonds: 145 wirs
+2 layer of looping",
+162,QUINSTAR,Wesley Louie,,,,,,,**ask for solder ball size or does the chip already have C4 bumps?  Details,
+163,Northeastern.Edu,Yi Zhuang,QU-24754,,,,,,"Green lines are high frequency
+signal lines
+White are DC lines
+Yellow are GND lines
+- 5-10 chip needs to be bond in total.
+- Preferred die bonding process: Epoxy (conductive)
+- Wire type: Gold 0.8mil
+- Encapsulation: UV cure (clear epoxy)",
+186,Edward Life Sciences,Thaer Alafghani,QU-24755,,,,,,"Request a quote for 12 units build. They already ship the parts: ASICs, MEMS, and PCBs
+Similar build as before.
+They send die with completed bump ball on it.",
+182,Texas Instruments,Yande Peng,QU-24752,,,,,,He is asking if the Quote still the same if the the connector needs to be the solder.,QU-24752
+187,Texas Instruments,Yu Yao,,,,,,,"Ask if the NRE fee still apply to this, almost similar to previous build
+Build 3x PCBs with 2 die
+Die attach
+wire bond 6 wires each PCB
+Encapsulation of wires",
+188,Edward Life Sciences,Thaer Alafghani,,,,,,,"Soldering - components
+Die attach - 2 die
+wire bond - 16 wires",`;
     filename = 'projects-template.csv';
   } else {
     // Default to work orders template
