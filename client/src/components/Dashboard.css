@@ -142,9 +142,10 @@
 }
 
 .view-btn.active {
-  background: var(--primary-color);
+  background: var(--gradient-nav);
   color: white;
   border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Stats Grid */
@@ -569,13 +570,15 @@
 }
 
 .btn-primary {
-  background: var(--primary-color);
+  background: var(--gradient-button);
   color: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-  background: var(--primary-dark);
+  background: var(--gradient-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-outline {
