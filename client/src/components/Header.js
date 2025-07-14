@@ -2,16 +2,19 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiHome, FiPlus, FiUsers, FiUpload, FiUserCheck, FiFolderPlus } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle';
+import { useTheme } from '../contexts/ThemeContext';
 import './Header.css';
 
-// Import your logo here (uncomment and adjust the path when you add the logo)
-// import logoImage from '../assets/logo.png';
+// Import theme-specific logos
+import logoLight from '../assets/logo-light-theme.png';
+import logoDark from '../assets/logo-dark-theme.png';
 
 const Header = () => {
   const location = useLocation();
+  const { isDarkMode } = useTheme();
   
   // Set this to true when you have the logo file
-  const hasLogo = false; // Change to true when logo is added
+  const hasLogo = true; // Change to true when logo is added
 
   return (
     <header className="header">
@@ -22,7 +25,7 @@ const Header = () => {
               <div className="brand-logo">
                 {hasLogo ? (
                   <img 
-                    src="/logo.png" 
+                    src={isDarkMode ? logoDark : logoLight} 
                     alt="SC Micro Logo" 
                     className="logo-image"
                   />
@@ -30,7 +33,6 @@ const Header = () => {
                   <div className="logo-placeholder">SC</div>
                 )}
               </div>
-              <h1 className="brand-title">SC Micro</h1>
             </Link>
           </div>
           
