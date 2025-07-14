@@ -26,6 +26,7 @@ db.once('open', () => {
 // Routes
 app.use('/api/workrequests', require('./routes/workRequests'));
 app.use('/api/customers', require('./routes/customers'));
+app.use('/api/projects', require('./routes/projects'));
 app.use('/api/csv', require('./routes/csvUpload'));
 
 // Serve static assets if in production

@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import WorkRequestForm from './components/WorkRequestForm';
 import CustomerForm from './components/CustomerForm';
+import ProjectForm from './components/ProjectForm';
 import CSVUpload from './components/CSVUpload';
 import CustomersOverview from './components/CustomersOverview';
 import './App.css';
@@ -12,6 +13,7 @@ import './App.css';
 function App() {
   const [workRequests, setWorkRequests] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,13 +22,15 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const [workRequestsRes, customersRes] = await Promise.all([
+      const [workRequestsRes, customersRes, projectsRes] = await Promise.all([
         axios.get('/api/workrequests'),
-        axios.get('/api/customers')
+        axios.get('/api/customers'),
+        axios.get('/api/projects')
       ]);
       
       setWorkRequests(workRequestsRes.data);
       setCustomers(customersRes.data);
+      setProjects(projectsRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -79,6 +83,40 @@ function App() {
     }
   };
 
+  const addProject = async (projectData) => {
+    try {
+      const response = await axios.post('/api/projects', projectData);
+      setProjects([response.data, ...projects]);
+      return response.data;
+    } catch (error) {
+      console.error('Error adding project:', error);
+      throw error;
+    }
+  };
+
+  const updateProject = async (id, projectData) => {
+    try {
+      const response = await axios.put(`/api/projects/${id}`, projectData);
+      setProjects(projects.map(p => 
+        p._id === id ? response.data : p
+      ));
+      return response.data;
+    } catch (error) {
+      console.error('Error updating project:', error);
+      throw error;
+    }
+  };
+
+  const deleteProject = async (id) => {
+    try {
+      await axios.delete(`/api/projects/${id}`);
+      setProjects(projects.filter(p => p._id !== id));
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      throw error;
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -100,8 +138,11 @@ function App() {
                 <Dashboard 
                   workRequests={workRequests}
                   customers={customers}
+                  projects={projects}
                   onUpdateWorkRequest={updateWorkRequest}
                   onDeleteWorkRequest={deleteWorkRequest}
+                  onUpdateProject={updateProject}
+                  onDeleteProject={deleteProject}
                   onRefresh={fetchData}
                 />
               } 
@@ -130,6 +171,14 @@ function App() {
               element={
                 <CustomerForm 
                   onSubmit={addCustomer}
+                />
+              } 
+            />
+            <Route 
+              path="/add-project" 
+              element={
+                <ProjectForm 
+                  onSubmit={addProject}
                 />
               } 
             />

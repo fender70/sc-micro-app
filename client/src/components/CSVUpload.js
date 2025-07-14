@@ -1,59 +1,67 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiUpload, FiDownload, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiUpload, FiDownload, FiFileText, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import axios from 'axios';
 import './CSVUpload.css';
 
 const CSVUpload = ({ onUploadSuccess }) => {
-  const navigate = useNavigate();
-  const [file, setFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [csvType, setCsvType] = useState('workorders');
+  const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
-  const [dragActive, setDragActive] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleFileSelect = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile && selectedFile.type === 'text/csv') {
-      setFile(selectedFile);
-      setUploadResult(null);
-    } else {
-      alert('Please select a valid CSV file');
-    }
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
   };
 
-  const handleDrag = (e) => {
+  const handleDragLeave = (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
+    setIsDragging(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+    setIsDragging(false);
     
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type === 'text/csv') {
-      setFile(droppedFile);
-      setUploadResult(null);
-    } else {
-      alert('Please drop a valid CSV file');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        setSelectedFile(file);
+        setError('');
+      } else {
+        setError('Please select a valid CSV file');
+      }
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        setSelectedFile(file);
+        setError('');
+      } else {
+        setError('Please select a valid CSV file');
+      }
     }
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      alert('Please select a CSV file first');
+    if (!selectedFile) {
+      setError('Please select a file to upload');
       return;
     }
 
     setUploading(true);
+    setError('');
+    setUploadResult(null);
+
     const formData = new FormData();
-    formData.append('csvFile', file);
+    formData.append('csvFile', selectedFile);
+    formData.append('csvType', csvType);
 
     try {
       const response = await axios.post('/api/csv/upload', formData, {
@@ -63,170 +71,223 @@ const CSVUpload = ({ onUploadSuccess }) => {
       });
 
       setUploadResult(response.data);
+      setSelectedFile(null);
       
-      if (response.data.summary.successful > 0) {
-        // Refresh the dashboard data
-        if (onUploadSuccess) {
-          onUploadSuccess();
-        }
+      if (onUploadSuccess) {
+        onUploadSuccess();
       }
     } catch (error) {
       console.error('Upload error:', error);
-      setUploadResult({
-        msg: 'Upload failed',
-        summary: { totalProcessed: 0, successful: 0, errors: 1 },
-        errors: [{ row: 0, error: error.response?.data?.msg || 'Upload failed' }]
-      });
+      setError(error.response?.data?.msg || 'Upload failed. Please try again.');
     } finally {
       setUploading(false);
     }
   };
 
-  const downloadTemplate = async () => {
+  const handleDownloadTemplate = async () => {
     try {
-      const response = await axios.get('/api/csv/template', {
+      const response = await axios.get(`/api/csv/template?type=${csvType}`, {
         responseType: 'blob',
       });
-      
-      // Create blob from response data
-      const blob = new Blob([response.data], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      
-      // Create download link
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'work-orders-template.csv';
+      link.setAttribute('download', csvType === 'projects' ? 'projects-template.csv' : 'work-orders-template.csv');
       document.body.appendChild(link);
       link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
+      link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Template download error:', error);
-      alert('Failed to download template: ' + error.message);
+      setError('Failed to download template. Please try again.');
     }
   };
 
-  const resetForm = () => {
-    setFile(null);
-    setUploadResult(null);
+  const getTemplateDescription = () => {
+    if (csvType === 'projects') {
+      return 'Download a template for project data including customer, project name, type, status, timeline, and team information.';
+    }
+    return 'Download a template for work order data including company name, contact, status, quote numbers, and project details.';
+  };
+
+  const getUploadDescription = () => {
+    if (csvType === 'projects') {
+      return 'Upload a CSV file containing project information. The file should include customer, project name, type, status, and other project details.';
+    }
+    return 'Upload a CSV file containing work order information. The file should include company name, contact, status, quote numbers, and project details.';
   };
 
   return (
-    <div className="container">
-      <div className="csv-upload-container">
-        <h2 className="csv-upload-title">
-          <FiUpload />
-          CSV Work Order Upload
+    <div className="csv-upload-container">
+      <div className="upload-header">
+        <h2 className="upload-title">
+          <FiFileText className="upload-icon" />
+          CSV Upload
         </h2>
+        <p className="upload-subtitle">
+          Upload work orders or projects from CSV files
+        </p>
+      </div>
 
-        <div className="csv-upload-content">
-          {/* Template Download */}
-          <div className="template-section">
-            <h3>Step 1: Download Template</h3>
-            <p>Download the CSV template to see the required format:</p>
-            <button onClick={downloadTemplate} className="btn btn-outline">
-              <FiDownload />
-              Download Template
-            </button>
-          </div>
-
-          {/* File Upload */}
-          <div className="upload-section">
-            <h3>Step 2: Upload CSV File</h3>
-            <p>Upload your CSV file with work order data:</p>
+      <div className="upload-content">
+        {/* CSV Type Selection */}
+        <div className="csv-type-selector">
+          <h3 className="section-title">Select CSV Type</h3>
+          <div className="type-options">
+            <label className="type-option">
+              <input
+                type="radio"
+                name="csvType"
+                value="workorders"
+                checked={csvType === 'workorders'}
+                onChange={(e) => setCsvType(e.target.value)}
+              />
+              <div className="type-content">
+                <FiFileText className="type-icon" />
+                <div>
+                  <div className="type-label">Work Orders</div>
+                  <div className="type-description">Upload work order data</div>
+                </div>
+              </div>
+            </label>
             
-            <div 
-              className={`file-drop-zone ${dragActive ? 'drag-active' : ''} ${file ? 'has-file' : ''}`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-            >
+            <label className="type-option">
+              <input
+                type="radio"
+                name="csvType"
+                value="projects"
+                checked={csvType === 'projects'}
+                onChange={(e) => setCsvType(e.target.value)}
+              />
+              <div className="type-content">
+                <FiFileText className="type-icon" />
+                <div>
+                  <div className="type-label">Projects</div>
+                  <div className="type-description">Upload project data</div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        {/* Template Download */}
+        <div className="template-section">
+          <h3 className="section-title">Download Template</h3>
+          <p className="template-description">
+            {getTemplateDescription()}
+          </p>
+          <button
+            onClick={handleDownloadTemplate}
+            className="btn btn-outline"
+            disabled={uploading}
+          >
+            <FiDownload />
+            Download {csvType === 'projects' ? 'Projects' : 'Work Orders'} Template
+          </button>
+        </div>
+
+        {/* File Upload */}
+        <div className="upload-section">
+          <h3 className="section-title">Upload CSV File</h3>
+          <p className="upload-description">
+            {getUploadDescription()}
+          </p>
+          
+          <div
+            className={`upload-area ${isDragging ? 'dragging' : ''} ${selectedFile ? 'has-file' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="upload-content">
+              <FiUpload className="upload-icon-large" />
+              <div className="upload-text">
+                {selectedFile ? (
+                  <>
+                    <div className="file-name">{selectedFile.name}</div>
+                    <div className="file-size">
+                      {(selectedFile.size / 1024).toFixed(1)} KB
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="upload-title-text">
+                      Drag and drop your CSV file here
+                    </div>
+                    <div className="upload-subtitle-text">
+                      or click to browse files
+                    </div>
+                  </>
+                )}
+              </div>
               <input
                 type="file"
                 accept=".csv"
                 onChange={handleFileSelect}
                 className="file-input"
-                id="csv-file-input"
+                id="file-input"
               />
-              <label htmlFor="csv-file-input" className="file-label">
-                {file ? (
-                  <div className="file-selected">
-                    <FiCheck />
-                    <span>{file.name}</span>
-                  </div>
-                ) : (
-                  <div className="file-placeholder">
-                    <FiUpload />
-                    <span>Drop CSV file here or click to browse</span>
-                  </div>
-                )}
+              <label htmlFor="file-input" className="file-input-label">
+                Choose File
               </label>
             </div>
-
-            {file && (
-              <div className="file-actions">
-                <button onClick={handleUpload} className="btn btn-primary" disabled={uploading}>
-                  <FiUpload />
-                  {uploading ? 'Uploading...' : 'Upload CSV'}
-                </button>
-                <button onClick={resetForm} className="btn btn-outline">
-                  <FiX />
-                  Clear
-                </button>
-              </div>
-            )}
           </div>
 
-          {/* Upload Results */}
+          {error && (
+            <div className="error-message">
+              <FiAlertCircle />
+              {error}
+            </div>
+          )}
+
           {uploadResult && (
-            <div className="upload-results">
-              <h3>Upload Results</h3>
-              
-              <div className="results-summary">
-                <div className="summary-item">
-                  <span className="summary-label">Total Processed:</span>
-                  <span className="summary-value">{uploadResult.summary.totalProcessed}</span>
+            <div className="upload-result">
+              <div className="result-header">
+                <FiCheckCircle className="success-icon" />
+                <span className="result-title">Upload Successful!</span>
+              </div>
+              <div className="result-summary">
+                <div className="result-item">
+                  <span className="result-label">Total Processed:</span>
+                  <span className="result-value">{uploadResult.summary.totalProcessed}</span>
                 </div>
-                <div className="summary-item">
-                  <span className="summary-label">Successful:</span>
-                  <span className="summary-value success">{uploadResult.summary.successful}</span>
+                <div className="result-item">
+                  <span className="result-label">Successful:</span>
+                  <span className="result-value success">{uploadResult.summary.successful}</span>
                 </div>
-                <div className="summary-item">
-                  <span className="summary-label">Errors:</span>
-                  <span className="summary-value error">{uploadResult.summary.errors}</span>
+                <div className="result-item">
+                  <span className="result-label">Errors:</span>
+                  <span className="result-value error">{uploadResult.summary.errors}</span>
                 </div>
               </div>
-
+              
               {uploadResult.errors && uploadResult.errors.length > 0 && (
-                <div className="error-list">
-                  <h4>Errors:</h4>
-                  {uploadResult.errors.map((error, index) => (
-                    <div key={index} className="error-item">
-                      <FiAlertCircle />
-                      <span>Row {error.row}: {error.error}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {uploadResult.summary.successful > 0 && (
-                <div className="success-message">
-                  <FiCheck />
-                  <span>Successfully uploaded {uploadResult.summary.successful} work orders!</span>
+                <div className="error-details">
+                  <h4>Error Details:</h4>
+                  <div className="error-list">
+                    {uploadResult.errors.map((error, index) => (
+                      <div key={index} className="error-item">
+                        <span className="error-row">Row {error.row}:</span>
+                        <span className="error-message">{error.error}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           )}
-        </div>
 
-        <div className="csv-upload-actions">
-          <button onClick={() => navigate('/')} className="btn btn-outline">
-            <FiX />
-            Back to Dashboard
-          </button>
+          <div className="upload-actions">
+            <button
+              onClick={handleUpload}
+              className="btn btn-primary"
+              disabled={!selectedFile || uploading}
+            >
+              <FiUpload />
+              {uploading ? 'Uploading...' : 'Upload CSV'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

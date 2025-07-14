@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiHome, FiPlus, FiUsers, FiUpload, FiUserCheck } from 'react-icons/fi';
+import { FiHome, FiPlus, FiUsers, FiUpload, FiUserCheck, FiFolderPlus } from 'react-icons/fi';
 import './Header.css';
 
 const Header = () => {
@@ -32,6 +32,14 @@ const Header = () => {
             >
               <FiUserCheck />
               <span>Customers</span>
+            </Link>
+            
+            <Link 
+              to="/add-project" 
+              className={`nav-link ${location.pathname === '/add-project' ? 'active' : ''}`}
+            >
+              <FiFolderPlus />
+              <span>New Project</span>
             </Link>
             
             <Link 
