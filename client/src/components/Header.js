@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiHome, FiPlus, FiUsers } from 'react-icons/fi';
+import { FiHome, FiPlus, FiUsers, FiUpload } from 'react-icons/fi';
 import './Header.css';
 
 const Header = () => {
@@ -40,6 +40,14 @@ const Header = () => {
             >
               <FiUsers />
               <span>Add Customer</span>
+            </Link>
+            
+            <Link 
+              to="/csv-upload" 
+              className={`nav-link ${location.pathname === '/csv-upload' ? 'active' : ''}`}
+            >
+              <FiUpload />
+              <span>CSV Upload</span>
             </Link>
           </nav>
         </div>
