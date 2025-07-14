@@ -23,8 +23,30 @@
   text-decoration: none;
   color: inherit;
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-placeholder {
+  width: 40px;
+  height: 40px;
+  background: var(--gradient-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: white;
+  box-shadow: var(--shadow-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .brand-title {
@@ -34,13 +56,7 @@
   margin: 0;
 }
 
-.brand-subtitle {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+
 
 .header-nav {
   display: flex;
@@ -88,6 +104,21 @@
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
+  }
+  
+  .header-brand {
+    justify-content: center;
+  }
+  
+  .brand-link {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .logo-placeholder {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
   }
   
   .header-nav {

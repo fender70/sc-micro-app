@@ -13,8 +13,10 @@ const Header = () => {
         <div className="header-content">
           <div className="header-brand">
             <Link to="/" className="brand-link">
+              <div className="brand-logo">
+                <div className="logo-placeholder">SC</div>
+              </div>
               <h1 className="brand-title">SC Micro</h1>
-              <span className="brand-subtitle">Work Request Dashboard</span>
             </Link>
           </div>
           
