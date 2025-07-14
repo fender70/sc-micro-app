@@ -1,5 +1,5 @@
 .header {
-  background: var(--surface-color);
+  background: var(--gradient-header);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   position: sticky;
