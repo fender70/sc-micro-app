@@ -165,7 +165,7 @@
   background: var(--gradient-card);
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
-  padding: 1rem;
+  padding: 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -220,7 +220,7 @@
 }
 
 .stat-number {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   background: var(--gradient-text);
   -webkit-background-clip: text;
@@ -233,7 +233,7 @@
 
 .stat-label {
   color: var(--text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 500;
 }
 
