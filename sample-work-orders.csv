@@ -1,6 +1,6 @@
-Date Entered,Company Name,Contact,Status,Quote #,QTY,PO#,Invoice#
-2024-01-15,TechCorp Industries,John Smith,Pending,XERO-2024-001,1,PO-2024-001,
-2024-01-16,Innovate Solutions,Sarah Johnson,In Progress,XERO-2024-002,2,PO-2024-002,INV-2024-002
-2024-01-17,Startup.io,Mike Chen,Completed,XERO-2024-003,1,PO-2024-003,INV-2024-003
-2024-01-18,Global Tech,Emily Davis,Pending,XERO-2024-004,3,PO-2024-004,
-2024-01-19,Digital Solutions,Alex Wilson,Shipped,XERO-2024-005,1,PO-2024-005,INV-2024-005 
+SN,Customer,PIC Name,Quote #,PO#,Invoice #,Amount Invoiced ($),Completion Date,Photo,Project Information,Comments
+157,Open Light Photonics,Sheri Wang,QU-24733,INV-2536,INV-2536,"4,965.94",7-Jun,,"Manual remove the singulated die from wafer","QU24733"
+150,Qorvo,James Wang,QU-24732,,,,,,"Eutectic die attach","QU-24732"
+160,Semi Pac Reclaim,John Mackay,QU-24730,,INV-2521,"3,030.17",4/17/2025,,"Wirebond project. No Die attach","QU-24730"
+78,AMRF,Qianli Mu,QU-24696,,,,,,"Total number of Assembly – 4","Need to update the quote"
+163,Cornel University,Jaeyun Moon,QU-24736,,,,,,"Wirebond 2 Devices Al wire","" 

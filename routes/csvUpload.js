@@ -6,6 +6,21 @@ const fs = require('fs');
 const WorkRequest = require('../models/WorkRequest');
 const Customer = require('../models/Customer');
 
+// Status mapping function
+const mapStatus = (status) => {
+  const statusMap = {
+    'pending': 'pending',
+    'in progress': 'in-progress',
+    'completed': 'completed',
+    'shipped': 'shipped',
+    'Pending': 'pending',
+    'In Progress': 'in-progress',
+    'Completed': 'completed',
+    'Shipped': 'shipped'
+  };
+  return statusMap[status] || 'pending';
+};
+
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -63,42 +78,50 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 
             try {
               // Validate required fields
-              if (!row['Company Name'] || !row['Contact']) {
+              if (!row['Customer'] || !row['PIC Name']) {
                 errors.push({
                   row: i + 1,
-                  error: 'Missing required fields: Company Name and Contact are required'
+                  error: 'Missing required fields: Customer and PIC Name are required'
                 });
                 continue;
               }
 
               // Find or create customer
               let customer = await Customer.findOne({ 
-                company: row['Company Name'],
-                name: row['Contact']
+                company: row['Customer'],
+                name: row['PIC Name']
               });
 
               if (!customer) {
                 customer = new Customer({
-                  name: row['Contact'],
-                  email: `${row['Contact'].toLowerCase().replace(/\s+/g, '.')}@${row['Company Name'].toLowerCase().replace(/\s+/g, '')}.com`,
+                  name: row['PIC Name'],
+                  email: `${row['PIC Name'].toLowerCase().replace(/\s+/g, '.')}@${row['Customer'].toLowerCase().replace(/\s+/g, '')}.com`,
                   phone: '',
-                  company: row['Company Name'],
+                  company: row['Customer'],
                   address: {},
-                  notes: ''
+                  notes: row['Comments'] || ''
                 });
                 await customer.save();
+              }
+
+              // Determine status based on completion date and invoice
+              let status = 'pending';
+              if (row['Invoice #'] && row['Invoice #'].trim() !== '') {
+                status = 'completed';
+              } else if (row['Completion Date'] && row['Completion Date'].trim() !== '') {
+                status = 'in-progress';
               }
 
               // Create work request
               const workRequest = new WorkRequest({
                 customer: customer._id,
-                workRequestDetails: `Work order for ${row['Company Name']} - QTY: ${row['QTY'] || '1'}`,
+                workRequestDetails: row['Project Information'] || `Project for ${row['Customer']}`,
                 quoteNumber: row['Quote #'] || '',
                 poNumber: row['PO#'] || '',
-                scMicroReport: '',
-                invoiceNumber: row['Invoice#'] || '',
-                shipDate: row['Date Entered'] ? new Date(row['Date Entered']) : null,
-                status: row['Status'] ? row['Status'].toLowerCase() : 'pending'
+                scMicroReport: row['Photo'] || '',
+                invoiceNumber: row['Invoice #'] || '',
+                shipDate: row['Completion Date'] ? new Date(row['Completion Date']) : null,
+                status: status
               });
 
               await workRequest.save();
@@ -151,10 +174,10 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 // @desc    Download CSV template
 // @access  Public
 router.get('/template', (req, res) => {
-  const csvTemplate = `Date Entered,Company Name,Contact,Status,Quote #,QTY,PO#,Invoice#
-"2024-01-15","TechCorp Industries","John Smith","Pending","XERO-2024-001","1","PO-2024-001",""
-"2024-01-16","Innovate Solutions","Sarah Johnson","In Progress","XERO-2024-002","2","PO-2024-002","INV-2024-002"
-"2024-01-17","Startup.io","Mike Chen","Completed","XERO-2024-003","1","PO-2024-003","INV-2024-003"`;
+  const csvTemplate = `SN,Customer,PIC Name,Quote #,PO#,Invoice #,Amount Invoiced ($),Completion Date,Photo,Project Information,Comments
+"157","Open Light Photonics","Sheri Wang","QU-24733","INV-2536","INV-2536","4,965.94","7-Jun","","Manual remove the singulated die from wafer","QU24733"
+"150","Qorvo","James Wang","QU-24732","","","","","","Eutectic die attach","QU-24732"
+"160","Semi Pac Reclaim","John Mackay","QU-24730","","INV-2521","3,030.17","4/17/2025","","Wirebond project. No Die attach","QU-24730"`;
 
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename="work-orders-template.csv"');

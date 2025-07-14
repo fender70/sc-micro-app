@@ -88,17 +88,23 @@ const CSVUpload = ({ onUploadSuccess }) => {
         responseType: 'blob',
       });
       
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Create blob from response data
+      const blob = new Blob([response.data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create download link
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'work-orders-template.csv');
+      link.download = 'work-orders-template.csv';
       document.body.appendChild(link);
       link.click();
-      link.remove();
+      
+      // Cleanup
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Template download error:', error);
-      alert('Failed to download template');
+      alert('Failed to download template: ' + error.message);
     }
   };
 
