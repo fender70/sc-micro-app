@@ -37,7 +37,7 @@
   
   /* Light theme gradients */
   --gradient-primary: linear-gradient(135deg, #D4AF37 0%, #E5C158 50%, #B8941F 100%);
-  --gradient-card: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 50%, #F1F5F9 100%);
+  --gradient-card: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 50%, #F3F4F6 100%);
   --gradient-header: linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 50%, #E5E7EB 100%);
   --gradient-button: linear-gradient(135deg, #D4AF37 0%, #E5C158 50%, #B8941F 100%);
   --gradient-hover: linear-gradient(135deg, #B8941F 0%, #D4AF37 50%, #8B6914 100%);
@@ -81,7 +81,7 @@
   
   /* Dark theme gradients */
   --gradient-primary: linear-gradient(135deg, #D4AF37 0%, #E5C158 50%, #B8941F 100%);
-  --gradient-card: linear-gradient(135deg, #1A1A1A 0%, #262626 50%, #333333 100%);
+  --gradient-card: linear-gradient(135deg, #1A1A1A 0%, #222222 50%, #2A2A2A 100%);
   --gradient-header: linear-gradient(135deg, #1A1A1A 0%, #0F0F0F 50%, #000000 100%);
   --gradient-button: linear-gradient(135deg, #D4AF37 0%, #E5C158 50%, #B8941F 100%);
   --gradient-hover: linear-gradient(135deg, #E5C158 0%, #D4AF37 50%, #B8941F 100%);
