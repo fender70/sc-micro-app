@@ -78,49 +78,59 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 
             try {
               // Validate required fields
-              if (!row['Customer'] || !row['PIC Name']) {
+              if (!row['Company Name'] || !row['Contact']) {
                 errors.push({
                   row: i + 1,
-                  error: 'Missing required fields: Customer and PIC Name are required'
+                  error: 'Missing required fields: Company Name and Contact are required'
                 });
                 continue;
               }
 
               // Find or create customer
               let customer = await Customer.findOne({ 
-                company: row['Customer'],
-                name: row['PIC Name']
+                company: row['Company Name'],
+                name: row['Contact']
               });
 
               if (!customer) {
                 customer = new Customer({
-                  name: row['PIC Name'],
-                  email: `${row['PIC Name'].toLowerCase().replace(/\s+/g, '.')}@${row['Customer'].toLowerCase().replace(/\s+/g, '')}.com`,
+                  name: row['Contact'],
+                  email: `${row['Contact'].toLowerCase().replace(/\s+/g, '.')}@${row['Company Name'].toLowerCase().replace(/\s+/g, '')}.com`,
                   phone: '',
-                  company: row['Customer'],
+                  company: row['Company Name'],
                   address: {},
-                  notes: row['Comments'] || ''
+                  notes: row['Status2'] || ''
                 });
                 await customer.save();
               }
 
-              // Determine status based on completion date and invoice
+              // Map status from the tracker format
               let status = 'pending';
-              if (row['Invoice #'] && row['Invoice #'].trim() !== '') {
+              const statusText = row['Status'] || '';
+              
+              if (statusText.includes('COMPLETE') || statusText.includes('Shipped')) {
                 status = 'completed';
-              } else if (row['Completion Date'] && row['Completion Date'].trim() !== '') {
+              } else if (statusText.includes('WIP') || statusText.includes('ACTIVE')) {
                 status = 'in-progress';
+              } else if (statusText.includes('QUOTED')) {
+                status = 'quoted';
+              } else if (statusText.includes('PO Received')) {
+                status = 'po-received';
+              } else if (statusText.includes('Payment')) {
+                status = 'payment';
+              } else if (statusText.includes('Cancelled')) {
+                status = 'cancelled';
               }
 
               // Create work request
               const workRequest = new WorkRequest({
                 customer: customer._id,
-                workRequestDetails: row['Project Information'] || `Project for ${row['Customer']}`,
+                workRequestDetails: `Project for ${row['Company Name']} - ${row['Status2'] || ''}`,
                 quoteNumber: row['Quote #'] || '',
                 poNumber: row['PO#'] || '',
-                scMicroReport: row['Photo'] || '',
+                scMicroReport: '',
                 invoiceNumber: row['Invoice #'] || '',
-                shipDate: row['Completion Date'] ? new Date(row['Completion Date']) : null,
+                shipDate: row['Date Entered'] ? new Date(row['Date Entered']) : null,
                 status: status
               });
 
@@ -174,10 +184,28 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 // @desc    Download CSV template
 // @access  Public
 router.get('/template', (req, res) => {
-  const csvTemplate = `SN,Customer,PIC Name,Quote #,PO#,Invoice #,Amount Invoiced ($),Completion Date,Photo,Project Information,Comments
-"157","Open Light Photonics","Sheri Wang","QU-24733","INV-2536","INV-2536","4,965.94","7-Jun","","Manual remove the singulated die from wafer","QU24733"
-"150","Qorvo","James Wang","QU-24732","","","","","","Eutectic die attach","QU-24732"
-"160","Semi Pac Reclaim","John Mackay","QU-24730","","INV-2521","3,030.17","4/17/2025","","Wirebond project. No Die attach","QU-24730"`;
+  const csvTemplate = `,Date Entered,Company Name,Contact,Status,Quote #,QTY,PO#,Invoice #, Amt Invoiced ($) ,Status2
+"1","7/18/2024","sonus micro systems","Fatemeh","8. NO Response (>60 days)","","","","","","9/5:  Need to follow up - Rhia
+7/26: Design is currently at the circuit level (will contact us when ready)"
+"2","7/18/2024","One health Biosensing","Dan Goldner","8. NO Response (>60 days)","","","","","","9/6:  Alternate epoxy to Chase
+9/5:  Follow up - Rizza
+8/19: Waiting for the 2 way NDA from paulo
+9/11: Create SOW 
+9/12: SOW Completed - to be review by Rizza
+9/27: Follow up on the old PCB and die. Have we send the test proposal?
+10/4: Followed up - Replied: Asking for test proposal"
+"3","7/30/2024","Sutter Hybrids","Josue Herrera","1. INQUIRY","","","","","","9/6:  Check back in 4-5 months
+9/5:  Need to followed up
+8/28: Had a meeting to touch basis"
+"4","7/31/2024","CSpeed","Gary Yi","8. NO Response (>60 days)","","","","","","8/2:  In Design phase and currently searching for an assembly house
+8/13: Followed up - will contact us when ready"
+"5","8/1/2024","Senseeker Corp","Zach Korth","3. PO Received","","","","","","9/5:  Reach out end of the year or early next
+11/5: Inquire about capability on bigger board.
+1/6: To follow up
+1/14: Online discussion of the project
+1/24: In process to include S&C to their approved vendor
+1/31: Received the parts
+2/21: Project completed and shipped"`;
 
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename="work-orders-template.csv"');
