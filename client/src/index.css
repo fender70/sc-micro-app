@@ -6,29 +6,29 @@
 
 :root {
   /* Light theme variables */
-  --primary-color: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-dark: #1e40af;
-  --secondary-color: #64748b;
+  --primary-color: #E8C11C;
+  --primary-hover: #A7881E;
+  --primary-dark: #463E22;
+  --secondary-color: #999999;
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --danger-color: #ef4444;
   
   /* Light theme backgrounds */
-  --background-color: #f8fafc;
-  --surface-color: #ffffff;
-  --bg-card: #ffffff;
-  --bg-secondary: #f1f5f9;
-  --bg-input: #ffffff;
-  --bg-hover: #f8fafc;
+  --background-color: #FFFFFF;
+  --surface-color: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-secondary: #f8f9fa;
+  --bg-input: #FFFFFF;
+  --bg-hover: #f8f9fa;
   
   /* Light theme borders */
-  --border-color: #e2e8f0;
+  --border-color: #999999;
   
   /* Light theme text */
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
+  --text-primary: #463E22;
+  --text-secondary: #999999;
+  --text-muted: #999999;
   
   /* Light theme shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -44,20 +44,20 @@
 /* Dark theme */
 [data-theme="dark"] {
   /* Dark theme backgrounds */
-  --background-color: #0f172a;
-  --surface-color: #1e293b;
-  --bg-card: #1e293b;
-  --bg-secondary: #334155;
-  --bg-input: #334155;
-  --bg-hover: #475569;
+  --background-color: #000000;
+  --surface-color: #000000;
+  --bg-card: #000000;
+  --bg-secondary: #1a1a1a;
+  --bg-input: #1a1a1a;
+  --bg-hover: #2a2a2a;
   
   /* Dark theme borders */
-  --border-color: #334155;
+  --border-color: #333333;
   
   /* Dark theme text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
+  --text-primary: #FFFFFF;
+  --text-secondary: #999999;
+  --text-muted: #666666;
   
   /* Dark theme shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
