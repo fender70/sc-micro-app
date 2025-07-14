@@ -417,6 +417,22 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
               </div>
 
               <div className="project-actions">
+                <div className="action-buttons">
+                  <Link 
+                    to={`/edit-project/${project._id}`}
+                    className="btn btn-outline btn-sm"
+                    title="Edit project"
+                  >
+                    <FiEdit />
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleProjectDelete(project._id)}
+                    className="btn-delete"
+                  >
+                    Delete
+                  </button>
+                </div>
                 <select
                   value={project.status}
                   onChange={(e) => handleProjectStatusUpdate(project._id, e.target.value)}
@@ -429,12 +445,6 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-                <button
-                  onClick={() => handleProjectDelete(project._id)}
-                  className="btn-delete"
-                >
-                  Delete
-                </button>
               </div>
             </div>
           ))}

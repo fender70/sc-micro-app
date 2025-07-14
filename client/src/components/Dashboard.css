@@ -475,6 +475,11 @@
   border-top: 1px solid var(--border-color);
 }
 
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .status-select {
   padding: 0.5rem;
   border: 1px solid var(--border-color);

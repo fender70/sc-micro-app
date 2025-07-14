@@ -35,6 +35,11 @@
   margin-left: auto;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .meta-label svg {
   width: 1rem;
   height: 1rem;

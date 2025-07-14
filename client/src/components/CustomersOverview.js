@@ -158,10 +158,24 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
             </div>
           </div>
           <div className="customer-actions">
-            <button className="btn-icon" title="View Details">
+            <button 
+              className="btn-icon" 
+              title="View Details"
+              onClick={() => {
+                // TODO: Implement customer detail view
+                alert('Customer detail view coming soon!');
+              }}
+            >
               <FiEye />
             </button>
-            <button className="btn-icon" title="Edit Customer">
+            <button 
+              className="btn-icon" 
+              title="Edit Customer"
+              onClick={() => {
+                // TODO: Implement customer edit functionality
+                alert('Customer edit functionality coming soon!');
+              }}
+            >
               <FiEdit />
             </button>
           </div>

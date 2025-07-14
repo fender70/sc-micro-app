@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { FiEdit, FiTrash2, FiDownload, FiCalendar, FiHash, FiFileText } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiEdit, FiTrash2, FiDownload, FiCalendar, FiHash, FiFileText, FiEye } from 'react-icons/fi';
 import './WorkRequestCard.css';
 
 const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
@@ -151,14 +152,24 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
       </div>
 
       <div className="work-request-actions">
-        <button 
-          onClick={() => onDelete(workRequest._id)}
-          className="btn btn-danger btn-sm"
-          title="Delete work request"
-        >
-          <FiTrash2 />
-          Delete
-        </button>
+        <div className="action-buttons">
+          <Link 
+            to={`/edit-work-request/${workRequest._id}`}
+            className="btn btn-outline btn-sm"
+            title="Edit work request"
+          >
+            <FiEdit />
+            Edit
+          </Link>
+          <button 
+            onClick={() => onDelete(workRequest._id)}
+            className="btn btn-danger btn-sm"
+            title="Delete work request"
+          >
+            <FiTrash2 />
+            Delete
+          </button>
+        </div>
         <div className="work-request-date">
           Created: {formatDate(workRequest.createdAt)}
         </div>

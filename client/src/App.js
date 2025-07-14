@@ -4,8 +4,10 @@ import axios from 'axios';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import WorkRequestForm from './components/WorkRequestForm';
+import WorkRequestEditForm from './components/WorkRequestEditForm';
 import CustomerForm from './components/CustomerForm';
 import ProjectForm from './components/ProjectForm';
+import ProjectEditForm from './components/ProjectEditForm';
 import CSVUpload from './components/CSVUpload';
 import CustomersOverview from './components/CustomersOverview';
 import './App.css';
@@ -167,6 +169,16 @@ function App() {
               } 
             />
             <Route 
+              path="/edit-work-request/:id" 
+              element={
+                <WorkRequestEditForm 
+                  workRequests={workRequests}
+                  customers={customers}
+                  onUpdateWorkRequest={updateWorkRequest}
+                />
+              } 
+            />
+            <Route 
               path="/add-customer" 
               element={
                 <CustomerForm 
@@ -179,6 +191,16 @@ function App() {
               element={
                 <ProjectForm 
                   onSubmit={addProject}
+                />
+              } 
+            />
+            <Route 
+              path="/edit-project/:id" 
+              element={
+                <ProjectEditForm 
+                  projects={projects}
+                  customers={customers}
+                  onUpdateProject={updateProject}
                 />
               } 
             />
