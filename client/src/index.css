@@ -15,8 +15,8 @@
   --danger-color: #DC2626;
   
   /* Light theme backgrounds */
-  --background-color: #FAFAFA;
-  --surface-color: #FFFFFF;
+  --background-color: #F0F1F3;
+  --surface-color: #F7F7F8;
   --bg-card: #FFFFFF;
   --bg-secondary: #F3F4F6;
   --bg-input: #FFFFFF;
@@ -59,8 +59,8 @@
   --primary-dark: #B8941F;
   
   /* Dark theme backgrounds */
-  --background-color: #0F0F0F;
-  --surface-color: #1A1A1A;
+  --background-color: #181818;
+  --surface-color: #232323;
   --bg-card: #1A1A1A;
   --bg-secondary: #262626;
   --bg-input: #262626;

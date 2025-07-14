@@ -210,7 +210,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
           </div>
           <div className="stat-content">
             <div className="stat-number">{stats.totalWorkRequests}</div>
-            <div className="stat-label">Total Work Requests</div>
+            <div className="stat-label">Work Requests</div>
           </div>
         </div>
         <div className="stat-card projects">
@@ -219,7 +219,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
           </div>
           <div className="stat-content">
             <div className="stat-number">{stats.totalProjects}</div>
-            <div className="stat-label">Total Projects</div>
+            <div className="stat-label">Projects</div>
           </div>
         </div>
         <div className="stat-card active">
@@ -247,15 +247,6 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
           <div className="stat-content">
             <div className="stat-number">{stats.totalRevenue}</div>
             <div className="stat-label">Invoiced</div>
-          </div>
-        </div>
-        <div className="stat-card budget">
-          <div className="stat-icon">
-            <FiDollarSign />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">${(stats.totalBudget / 1000).toFixed(0)}k</div>
-            <div className="stat-label">Total Budget</div>
           </div>
         </div>
       </div>

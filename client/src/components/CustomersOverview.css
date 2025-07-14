@@ -295,8 +295,8 @@
 
 .metric-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
 }
 
 .metric {
@@ -350,7 +350,7 @@
 .customer-stats {
   margin-bottom: 1rem;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 0.5rem;
 }
 
@@ -543,7 +543,7 @@
   }
   
   .customer-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
   
   .customer-header {

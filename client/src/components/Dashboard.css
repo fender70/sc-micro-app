@@ -22,12 +22,15 @@
 .dashboard-title {
   font-size: 1.75rem;
   font-weight: 700;
+  color: #222;
+}
+
+[data-theme="dark"] .dashboard-title {
   background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  margin: 0;
 }
 
 .header-actions {
@@ -156,20 +159,28 @@
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.5rem; /* Reduced from 1rem to decrease spacing between stats */
+  margin-bottom: 0; /* Remove space below stats grid */
+  width: 100%;
 }
 
 .stat-card {
   background: var(--gradient-card);
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
-  padding: 0.5rem;
+  padding: 1rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   gap: 0.5rem;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
   transition: all 0.3s ease;
+  margin: 0; /* Remove any extra margin on stat cards */
 }
 
 .stat-card:hover {
@@ -202,25 +213,27 @@
 }
 
 .stat-icon {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: white;
   background: var(--gradient-stat);
   flex-shrink: 0;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.25rem;
 }
 
 .stat-content {
   flex: 1;
+  min-width: 0;
 }
 
 .stat-number {
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 700;
   background: var(--gradient-text);
   -webkit-background-clip: text;
@@ -229,12 +242,35 @@
   color: transparent;
   line-height: 1;
   margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+/* Light theme - dark numbers */
+.stat-number {
+  background: none;
+  color: #222;
+  -webkit-text-fill-color: #222;
+}
+
+/* Dark theme - gold numbers */
+[data-theme="dark"] .stat-number {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 .stat-label {
   color: var(--text-secondary);
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   font-weight: 500;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  text-align: left;
+  max-width: 100%;
+  margin-left: 0;
 }
 
 /* Status Breakdown */
@@ -243,6 +279,7 @@
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   padding: 1rem;
+  margin-top: 0.5rem; /* Add a small space above the bars */
   margin-bottom: 1.5rem;
 }
 
@@ -641,6 +678,24 @@
   
   .stats-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .stat-card {
+    padding: 0.5rem;
+  }
+  
+  .stat-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.65rem;
   }
   
   .projects-container.grid,
