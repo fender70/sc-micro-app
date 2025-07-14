@@ -31,7 +31,7 @@
 .work-request-customer {
   color: var(--text-secondary);
   font-size: 0.875rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   font-weight: 500;
 }
 
@@ -208,12 +208,14 @@
 }
 
 .btn-danger {
-  background: #ef4444;
-  color: white;
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: #ef4444;
+  color: white;
 }
 
 .btn-success {
