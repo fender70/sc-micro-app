@@ -162,10 +162,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
             <button 
               className="btn-icon" 
               title="View Details"
-              onClick={() => {
-                // TODO: Implement customer detail view
-                alert('Customer detail view coming soon!');
-              }}
+              onClick={() => navigate(`/customer/${customer._id}`)}
             >
               <FiEye />
             </button>

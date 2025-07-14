@@ -7,6 +7,7 @@ import WorkRequestForm from './components/WorkRequestForm';
 import WorkRequestEditForm from './components/WorkRequestEditForm';
 import CustomerForm from './components/CustomerForm';
 import CustomerEditForm from './components/CustomerEditForm';
+import CustomerDetailView from './components/CustomerDetailView';
 import ProjectForm from './components/ProjectForm';
 import ProjectEditForm from './components/ProjectEditForm';
 import CSVUpload from './components/CSVUpload';
@@ -169,6 +170,17 @@ function App() {
                 <CustomersOverview 
                   customers={customers}
                   workRequests={workRequests}
+                  onRefresh={fetchData}
+                />
+              } 
+            />
+            <Route 
+              path="/customer/:id" 
+              element={
+                <CustomerDetailView 
+                  customers={customers}
+                  workRequests={workRequests}
+                  projects={projects}
                   onRefresh={fetchData}
                 />
               } 
