@@ -10,6 +10,26 @@ const CSVUpload = ({ onUploadSuccess }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
   const [error, setError] = useState('');
+  const [componentError, setComponentError] = useState(null);
+
+  // Error boundary for the component
+  if (componentError) {
+    return (
+      <div className="csv-upload-container">
+        <div className="error-message">
+          <FiAlertCircle />
+          Something went wrong. Please refresh the page and try again.
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn btn-primary"
+            style={{ marginTop: '10px' }}
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -78,7 +98,8 @@ const CSVUpload = ({ onUploadSuccess }) => {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      setError(error.response?.data?.msg || 'Upload failed. Please try again.');
+      setError(error.response?.data?.error || error.response?.data?.message || 'Upload failed. Please try again.');
+      setUploadResult(null);
     } finally {
       setUploading(false);
     }
@@ -249,32 +270,22 @@ const CSVUpload = ({ onUploadSuccess }) => {
               </div>
               <div className="result-summary">
                 <div className="result-item">
-                  <span className="result-label">Total Processed:</span>
-                  <span className="result-value">{uploadResult.summary.totalProcessed}</span>
+                  <span className="result-label">Message:</span>
+                  <span className="result-value">{uploadResult.message}</span>
                 </div>
                 <div className="result-item">
-                  <span className="result-label">Successful:</span>
-                  <span className="result-value success">{uploadResult.summary.successful}</span>
+                  <span className="result-label">Processed:</span>
+                  <span className="result-value success">{uploadResult.processed}</span>
                 </div>
                 <div className="result-item">
-                  <span className="result-label">Errors:</span>
-                  <span className="result-value error">{uploadResult.summary.errors}</span>
+                  <span className="result-label">Added:</span>
+                  <span className="result-value success">{uploadResult.added}</span>
+                </div>
+                <div className="result-item">
+                  <span className="result-label">Updated:</span>
+                  <span className="result-value success">{uploadResult.updated}</span>
                 </div>
               </div>
-              
-              {uploadResult.errors && uploadResult.errors.length > 0 && (
-                <div className="error-details">
-                  <h4>Error Details:</h4>
-                  <div className="error-list">
-                    {uploadResult.errors.map((error, index) => (
-                      <div key={index} className="error-item">
-                        <span className="error-row">Row {error.row}:</span>
-                        <span className="error-message">{error.error}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
