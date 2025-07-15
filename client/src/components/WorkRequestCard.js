@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { FiEdit, FiTrash2, FiDownload, FiCalendar, FiHash, FiFileText, FiEye } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiDownload, FiCalendar, FiHash, FiFileText } from 'react-icons/fi';
 import './WorkRequestCard.css';
 
 const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {

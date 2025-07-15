@@ -9,7 +9,7 @@ import {
   FiMail, 
   FiPhone, 
   FiSearch,
-  FiFilter,
+
   FiEye,
   FiEdit,
   FiPlus
@@ -124,19 +124,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
     };
   }, [customers, workRequests, customerAnalytics]);
 
-  const getStatusColor = (status) => {
-    const colors = {
-      'pending': '#f59e0b',
-      'in-progress': '#3b82f6',
-      'completed': '#10b981',
-      'shipped': '#8b5cf6',
-      'quoted': '#06b6d4',
-      'po-received': '#f97316',
-      'payment': '#84cc16',
-      'cancelled': '#ef4444'
-    };
-    return colors[status] || '#6b7280';
-  };
+
 
   const getCustomerTier = (customerValue) => {
     if (customerValue >= 50) return { tier: 'Premium', color: '#10b981' };

@@ -13,7 +13,7 @@ import {
   FiTrendingUp, 
   FiFolder, 
   FiClipboard,
-  FiDownload,
+
   FiHash,
   FiFileText
 } from 'react-icons/fi';

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiRefreshCw, FiFilter, FiTrendingUp, FiCalendar, FiUsers, FiDollarSign, FiFolder, FiEdit } from 'react-icons/fi';
+import { FiPlus, FiRefreshCw, FiTrendingUp, FiCalendar, FiUsers, FiDollarSign, FiFolder, FiEdit } from 'react-icons/fi';
 import WorkRequestCard from './WorkRequestCard';
 import './Dashboard.css';
 
@@ -119,23 +119,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
     });
   }, [projects, filterStatus, filterCustomer, searchTerm]);
 
-  // Group work requests by customer for project view
-  const projectsByCustomer = useMemo(() => {
-    const grouped = {};
-    workRequests.forEach(request => {
-      const customerId = request.customer?._id;
-      if (customerId) {
-        if (!grouped[customerId]) {
-          grouped[customerId] = {
-            customer: request.customer,
-            projects: []
-          };
-        }
-        grouped[customerId].projects.push(request);
-      }
-    });
-    return Object.values(grouped);
-  }, [workRequests]);
+
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {

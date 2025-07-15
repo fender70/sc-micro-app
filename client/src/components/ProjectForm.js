@@ -56,7 +56,7 @@ const ProjectForm = ({ onSubmit }) => {
         budget: formData.budget ? parseFloat(formData.budget) : 0
       };
 
-      const result = await onSubmit(projectData);
+      await onSubmit(projectData);
       navigate('/');
     } catch (error) {
       console.error('Error creating project:', error);
