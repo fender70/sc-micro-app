@@ -1,7 +1,7 @@
 {
-  "name": "sc-micro-app",
+  "name": "sc-micro-enterprise-system",
   "version": "1.0.0",
-  "description": "Light enterprise app for managing customer work requests",
+  "description": "Full-stack MERN application for enterprise work request management, customer relationship tracking, and project analytics",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,7 +10,9 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-client": "cd client && npm install",
     "build": "cd client && npm run build",
-    "heroku-postbuild": "npm run install-client && npm run build"
+    "heroku-postbuild": "npm run install-client && npm run build",
+    "vercel-build": "npm run install-client && npm run build",
+    "seed": "node seed-data.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -29,11 +31,33 @@
     "nodemon": "^3.0.1"
   },
   "keywords": [
-    "mern",
+    "mern-stack",
     "enterprise",
     "dashboard",
-    "work-requests"
+    "work-requests",
+    "customer-management",
+    "project-tracking",
+    "react",
+    "nodejs",
+    "mongodb",
+    "express",
+    "fullstack",
+    "business-intelligence",
+    "csv-import",
+    "analytics"
   ],
-  "author": "SC Micro",
-  "license": "MIT"
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fender70/sc-micro-app"
+  },
+  "bugs": {
+    "url": "https://github.com/fender70/sc-micro-app/issues"
+  },
+  "homepage": "https://github.com/fender70/sc-micro-app/blob/main/README.md",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
 }

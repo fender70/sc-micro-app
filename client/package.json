@@ -1,7 +1,8 @@
 {
   "name": "sc-micro-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "React frontend for SC Micro Enterprise Management System",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
@@ -39,5 +40,15 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3001"
+  "vercel-build": "npm run build",
+  "keywords": [
+    "react",
+    "frontend",
+    "dashboard",
+    "enterprise",
+    "ui",
+    "components"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
 } 
