@@ -1,6 +1,6 @@
 # SC Micro Enterprise Management System
 
-A full-stack MERN application for managing work requests, customer relationships, and project tracking in a manufacturing environment.
+A full-stack MERN application for managing work requests, customer relationships, and project tracking in a manufacturing environment. **This is a demo version with in-memory data storage.**
 
 ## 🚀 Live Demo
 
@@ -43,9 +43,8 @@ A full-stack MERN application for managing work requests, customer relationships
 
 ### Backend
 - **Node.js** with Express.js framework
-- **MongoDB** with Mongoose ODM
-- **Multer** for file upload handling
-- **CSV Parser** for data import/export
+- **In-memory data storage** for demo purposes
+- **Mock CSV handling** for file upload simulation
 - **CORS** enabled for cross-origin requests
 
 ### Development Tools
@@ -70,10 +69,10 @@ A full-stack MERN application for managing work requests, customer relationships
    cd client && npm install && cd ..
    ```
 
-3. **Set up environment variables**
+3. **Set up environment variables (optional for demo)**
    ```bash
    cp .env.example .env
-   # Edit .env with your MongoDB connection string
+   # No database setup required for demo version
    ```
 
 4. **Start the development servers**
@@ -81,9 +80,9 @@ A full-stack MERN application for managing work requests, customer relationships
    npm run dev
    ```
 
-5. **Seed the database (optional)**
+5. **Seed the database (not needed for demo)**
    ```bash
-   node seed-data.js
+   # Demo version comes with pre-loaded sample data
    ```
 
 ## 🏗️ Project Structure
@@ -147,15 +146,17 @@ sc-micro-app/
 
 ## 🚀 Deployment
 
-### Backend Deployment
+### Demo Deployment
+1. Deploy to Vercel: `vercel --prod`
+2. No database setup required
+3. Application works immediately with sample data
+
+### Production Deployment
 1. Set up MongoDB Atlas or production MongoDB instance
 2. Deploy to Heroku, Railway, or similar platform
 3. Configure environment variables
-
-### Frontend Deployment
-1. Build the React app: `npm run build`
-2. Deploy to Vercel, Netlify, or similar platform
-3. Configure API endpoint URLs
+4. Build the React app: `npm run build`
+5. Deploy frontend to Vercel, Netlify, or similar platform
 
 ## 📝 License
 
