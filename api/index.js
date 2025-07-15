@@ -1,5 +1,5 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 
 const app = express();
 
@@ -318,7 +318,7 @@ app.get('/api/csv/template', (req, res) => {
 });
 
 // Export for Vercel serverless function
-module.exports = app;
+export default app;
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
