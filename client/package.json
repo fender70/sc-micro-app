@@ -2,6 +2,7 @@
   "name": "sc-micro-client",
   "version": "1.0.0",
   "private": true,
+  "homepage": ".",
   "description": "React frontend for SC Micro Enterprise Management System",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
