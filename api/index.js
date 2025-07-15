@@ -276,26 +276,54 @@ app.delete('/api/projects/:id', (req, res) => {
   }
 });
 
-// CSV routes
-app.post('/api/csv/upload', (req, res) => {
-  // Mock CSV upload response
-  res.json({ 
-    message: 'CSV uploaded successfully (demo mode)',
-    processed: 5,
-    added: 3,
-    updated: 2
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('API Error:', err);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: err.message 
   });
 });
 
-app.get('/api/csv/template', (req, res) => {
-  // Mock CSV template download
-  const csvContent = `Date Entered,Company Name,Contact,Status,Quote #,QTY,PO#,Invoice #,Amt Invoiced ($),Status2,Work Request Details
-2024-07-15,TechCorp Industries,John Smith,pending,Q-2024-006,50,PO-2024-006,,,Wirebond assembly for RF chips
-2024-07-15,Innovate Solutions,Sarah Johnson,in-progress,Q-2024-007,25,PO-2024-007,INV-2024-007,15000,Die attach for MEMS sensors`;
-  
-  res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename="work-order-template.csv"');
-  res.send(csvContent);
+// CSV routes
+app.post('/api/csv/upload', (req, res) => {
+  try {
+    // Mock CSV upload response
+    res.json({ 
+      message: 'CSV uploaded successfully (demo mode)',
+      processed: 5,
+      added: 3,
+      updated: 2
+    });
+  } catch (error) {
+    console.error('CSV upload error:', error);
+    res.status(500).json({ error: 'CSV upload failed' });
+  }
 });
 
-module.exports = app; 
+app.get('/api/csv/template', (req, res) => {
+  try {
+    // Mock CSV template download
+    const csvContent = `Date Entered,Company Name,Contact,Status,Quote #,QTY,PO#,Invoice #,Amt Invoiced ($),Status2,Work Request Details
+2024-07-15,TechCorp Industries,John Smith,pending,Q-2024-006,50,PO-2024-006,,,Wirebond assembly for RF chips
+2024-07-15,Innovate Solutions,Sarah Johnson,in-progress,Q-2024-007,25,PO-2024-007,INV-2024-007,15000,Die attach for MEMS sensors`;
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="work-order-template.csv"');
+    res.send(csvContent);
+  } catch (error) {
+    console.error('CSV template error:', error);
+    res.status(500).json({ error: 'CSV template download failed' });
+  }
+});
+
+// Export for Vercel serverless function
+module.exports = app;
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+} 
