@@ -197,6 +197,61 @@ app.get('/api/csv/template', (req, res) => {
   }
 });
 
+// Database management endpoints
+app.get('/api/database/backup', async (req, res) => {
+  try {
+    const data = await dbManager.exportData();
+    res.json({
+      message: 'Database backup created successfully',
+      data: data,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Database backup error:', error);
+    res.status(500).json({ error: 'Failed to create backup', details: error.message });
+  }
+});
+
+app.post('/api/database/restore', async (req, res) => {
+  try {
+    const { data } = req.body;
+    if (!data) {
+      return res.status(400).json({ error: 'Backup data is required' });
+    }
+    
+    await dbManager.importData(data);
+    res.json({
+      message: 'Database restored successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Database restore error:', error);
+    res.status(500).json({ error: 'Failed to restore database', details: error.message });
+  }
+});
+
+app.get('/api/database/status', async (req, res) => {
+  try {
+    const customers = await dbManager.getCustomers();
+    const workRequests = await dbManager.getWorkRequests();
+    const projects = await dbManager.getProjects();
+    
+    res.json({
+      status: 'healthy',
+      database_path: process.env.DATABASE_PATH || 'database/sc_micro.db',
+      record_counts: {
+        customers: customers.length,
+        workRequests: workRequests.length,
+        projects: projects.length
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Database status error:', error);
+    res.status(500).json({ error: 'Failed to get database status', details: error.message });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('API Error:', err);

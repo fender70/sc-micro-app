@@ -1,0 +1,10 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "volumes": [
+    {
+      "name": "database-storage",
+      "mountPath": "/data",
+      "size": "1GB"
+    }
+  ]
+} 

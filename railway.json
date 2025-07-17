@@ -9,6 +9,8 @@
     "restartPolicyMaxRetries": 10
   },
   "variables": {
-    "PYTHON_VERSION": "3.11"
+    "PYTHON_VERSION": "3.11",
+    "DATABASE_PATH": "/data/sc_micro.db",
+    "NODE_ENV": "production"
   }
 } 

@@ -1,165 +1,123 @@
-# Deployment Guide for SC Micro Enterprise System
+# SC Micro Deployment Guide
 
-## Overview
-This guide will help you deploy your SC Micro Enterprise System with:
-- **Backend**: Railway (Node.js + SQLite)
-- **Frontend**: Vercel (React)
+## Database Persistence Setup
 
-## Step 1: Deploy Backend to Railway
+This guide explains how to set up persistent database storage to prevent data loss during deployments.
 
-### 1.1 Prepare Your Repository
-Your repository is already prepared with the necessary files:
-- `railway.json` - Railway configuration
-- `Procfile` - Alternative deployment config
-- `package.json` - Updated with start script and Railway-compatible dependencies
+## Option 1: Railway with Persistent Volume (Recommended)
 
-### 1.2 Deploy to Railway
+### Step 1: Configure Railway Environment Variables
 
-1. **Go to [Railway.app](https://railway.app)**
-2. **Sign in with GitHub**
-3. **Click "New Project"**
-4. **Select "Deploy from GitHub repo"**
-5. **Choose your `sc-micro-app` repository**
-6. **Railway will automatically detect it's a Node.js app**
+In your Railway project dashboard, set these environment variables:
 
-### 1.3 Configure Railway Settings
-
-1. **In your Railway project dashboard:**
-   - Go to Settings → General
-   - Set the **Start Command** to: `npm run backend`
-   - Set the **Health Check Path** to: `/api/test`
-
-2. **Add Environment Variables (if needed):**
-   - Go to Settings → Variables
-   - Add any environment variables your app needs
-
-### 1.4 Get Your Railway URL
-
-1. **Go to the "Deployments" tab**
-2. **Click on your latest deployment**
-3. **Copy the generated URL** (e.g., `https://your-app-name-production.up.railway.app`)
-
-## Step 2: Configure Frontend for Production
-
-### 2.1 Set Environment Variable in Vercel
-
-1. **Go to your Vercel project dashboard**
-2. **Navigate to Settings → Environment Variables**
-3. **Add a new variable:**
-   - **Name**: `REACT_APP_API_URL`
-   - **Value**: Your Railway URL (e.g., `https://your-app-name-production.up.railway.app`)
-   - **Environment**: Production
-   - **Save**
-
-### 2.2 Redeploy Frontend
-
-1. **In Vercel dashboard, go to Deployments**
-2. **Click "Redeploy" on your latest deployment**
-3. **Or push a new commit to trigger automatic deployment**
-
-## Step 3: Test Your Deployment
-
-### 3.1 Test Backend Endpoints
-
-Test your Railway backend directly:
 ```bash
-# Test the API
-curl https://your-app-name-production.up.railway.app/api/test
+DATABASE_PATH=/data/sc_micro.db
+NODE_ENV=production
+PYTHON_VERSION=3.11
+```
 
-# Test customers endpoint
-curl https://your-app-name-production.up.railway.app/api/customers
+### Step 2: Create a Data Volume
 
-# Test assistant endpoint
-curl -X POST https://your-app-name-production.up.railway.app/api/assistant/chat \
+1. Go to your Railway project dashboard
+2. Navigate to "Volumes" tab
+3. Create a new volume:
+   - **Name**: `database-storage`
+   - **Mount Path**: `/data`
+   - **Size**: `1GB` (or as needed)
+
+### Step 3: Deploy Your Application
+
+The database will now persist in the `/data` directory across deployments.
+
+## Option 2: Manual Backup/Restore Process
+
+### Before Deployment (Backup)
+
+```bash
+# Create a backup of current data
+npm run backup
+
+# Or use the API endpoint
+curl -X GET http://localhost:3001/api/database/backup > backup.json
+```
+
+### After Deployment (Restore)
+
+```bash
+# Restore from backup
+npm run restore
+
+# Or use the API endpoint
+curl -X POST http://localhost:3001/api/database/restore \
   -H "Content-Type: application/json" \
-  -d '{"message": "Hello"}'
+  -d @backup.json
 ```
 
-### 3.2 Test Frontend
+## Database Management Commands
 
-1. **Visit your Vercel URL**
-2. **Test all functionality:**
-   - Dashboard loading
-   - Customer management
-   - Work request creation
-   - Project management
-   - CSV upload
-   - Assistant chat
-
-## Step 4: Troubleshooting
-
-### Common Issues
-
-**Backend 500 Errors:**
-- Check Railway logs in the dashboard
-- Ensure database is initializing properly
-- Verify all dependencies are installed
-- Database uses standard sqlite3 package (no compilation required)
-
-**Frontend Can't Connect to Backend:**
-- Verify `REACT_APP_API_URL` is set correctly in Vercel
-- Check CORS settings in your backend
-- Test backend URL directly
-
-**Database Issues:**
-- SQLite file is created automatically on Railway
-- Data persists between deployments
-- Check Railway logs for database errors
-- Uses standard sqlite3 package (no Python compilation required)
-
-### Useful Commands
-
-**Check Railway Logs:**
-- Go to Railway dashboard → Deployments → Latest deployment → Logs
-
-**Check Vercel Logs:**
-- Go to Vercel dashboard → Deployments → Latest deployment → Functions
-
-**Test Local Backend:**
+### Check Database Status
 ```bash
-npm run backend
+npm run db:status
 ```
 
-**Test Local Frontend:**
+### Create Backup
 ```bash
-npm run dev
+npm run backup
 ```
 
-## Step 5: Production Considerations
+### Restore from Backup
+```bash
+npm run restore
+```
 
-### Security
-- ✅ CORS is configured for production
-- ✅ Input validation is implemented
-- ✅ SQL injection protection via prepared statements
+### API Endpoints
 
-### Performance
-- ✅ Database queries are optimized
-- ✅ Frontend is built for production
-- ✅ Static assets are served efficiently
+- `GET /api/database/status` - Check database health and record counts
+- `GET /api/database/backup` - Export current data as JSON
+- `POST /api/database/restore` - Import data from JSON backup
 
-### Monitoring
-- Railway provides built-in monitoring
-- Vercel provides performance analytics
-- Consider adding error tracking (Sentry, etc.)
+## Environment Variables
 
-## Success Checklist
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_PATH` | Path to SQLite database file | `database/sc_micro.db` |
+| `NODE_ENV` | Application environment | `development` |
+| `PYTHON_VERSION` | Python version for LangGraph | `3.11` |
 
-- [ ] Backend deployed to Railway
-- [ ] Frontend deployed to Vercel
-- [ ] Environment variable set in Vercel
-- [ ] Backend URL accessible
-- [ ] Frontend can connect to backend
-- [ ] All features working in production
-- [ ] Database persisting data
-- [ ] CSV upload working
-- [ ] Assistant chat functional
+## Troubleshooting
 
-## Support
+### Database Not Persisting
 
-If you encounter issues:
-1. Check the logs in both Railway and Vercel
-2. Test endpoints directly with curl
-3. Verify environment variables are set correctly
-4. Ensure all dependencies are properly installed
+1. Check if `DATABASE_PATH` is set correctly
+2. Verify the volume is mounted at the correct path
+3. Ensure the application has write permissions
 
-Your deployment should be complete once you've followed these steps! 
+### Backup/Restore Issues
+
+1. Check if backup files exist in `backups/` directory
+2. Verify JSON format is valid
+3. Check database connection status
+
+### Performance Issues
+
+1. Consider increasing volume size if needed
+2. Monitor database file size
+3. Implement regular cleanup of old backups
+
+## Best Practices
+
+1. **Regular Backups**: Create backups before major deployments
+2. **Test Restore**: Verify backup/restore process works
+3. **Monitor Storage**: Keep track of database and backup sizes
+4. **Version Control**: Don't commit database files to git
+5. **Environment Separation**: Use different databases for dev/staging/prod
+
+## Migration to External Database
+
+For production applications, consider migrating to:
+
+- **PostgreSQL** (Railway supports this)
+- **MongoDB Atlas**
+- **Supabase**
+
+This provides better scalability and reliability than SQLite. 

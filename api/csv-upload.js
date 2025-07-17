@@ -121,21 +121,21 @@ async function processProjects(csvData) {
         try {
             results.processed++;
             
-            // Map CSV columns to database fields
+            // Map CSV columns to project fields
             const projectData = {
-                name: row['Project Name'],
-                type: row['Project Type'],
-                status: mapStatus(row['Status']),
-                priority: mapPriority(row['Priority']),
-                budget: parseFloat(row['Budget']) || null,
-                start_date: row['Start Date'],
-                target_date: row['Target Date'],
-                description: row['Description'],
+                name: `${row['Customer']} - ${row['Project Information']?.substring(0, 50) || 'Project'}`,
+                type: determineProjectType(row['Project Information'] || row['Comments']),
+                status: mapStatus(determineStatusFromData(row)),
+                priority: mapPriority(determinePriorityFromData(row)),
+                budget: parseFloat(row['Amount Invoiced ($)']?.replace(/[,$]/g, '')) || null,
+                start_date: row['Completion Date'] || new Date().toISOString().split('T')[0],
+                target_date: row['Completion Date'] || null,
+                description: row['Project Information'] || row['Comments'],
                 quote_number: row['Quote #'],
-                po_number: row['PO #'],
-                project_manager: row['Project Manager'],
-                technical_lead: row['Technical Lead'],
-                notes: row['Notes']
+                po_number: row['PO#'],
+                project_manager: row['PIC Name'] || '',
+                technical_lead: row['PIC Name'] || '',
+                notes: row['Comments'] || ''
             };
 
             // Find or create customer
@@ -143,10 +143,11 @@ async function processProjects(csvData) {
             projectData.customer_id = customer.id;
             projectData.customer_name = customer.name;
 
-            // Check if project already exists (by name and customer)
+            // Check if project already exists (by quote number or name and customer)
             const existingProjects = await dbManager.getProjects();
             const existing = existingProjects.find(p => 
-                p.name === projectData.name && p.customer_id === projectData.customer_id
+                (p.quote_number && p.quote_number === projectData.quote_number) ||
+                (p.name === projectData.name && p.customer_id === projectData.customer_id)
             );
             
             if (existing) {
@@ -305,8 +306,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         // Process data based on type
         let results;
         if (csvType === 'projects') {
-            // Projects use the same format as work orders (Project Details format)
-            results = await processWorkOrders(csvData);
+            results = await processProjects(csvData);
         } else {
             results = await processWorkOrders(csvData);
         }

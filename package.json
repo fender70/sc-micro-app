@@ -14,7 +14,12 @@
     "build": "vite build",
     "vercel-build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backup": "node scripts/backup-db.js",
+    "restore": "node scripts/restore-db.js",
+    "db:status": "curl -s http://localhost:3001/api/database/status | jq .",
+    "db:backup": "curl -s http://localhost:3001/api/database/backup > backups/backup-$(date +%Y%m%d-%H%M%S).json",
+    "db:restore": "node scripts/restore-from-backup.js"
   },
   "dependencies": {
     "axios": "^1.10.0",

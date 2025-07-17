@@ -9,7 +9,10 @@ const __dirname = path.dirname(__filename);
 class DatabaseManager {
     constructor() {
         this.db = null;
-        this.dbPath = path.join(__dirname, 'sc_micro.db');
+        // Use environment variable for database path, fallback to local path
+        const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'sc_micro.db');
+        this.dbPath = dbPath;
+        console.log(`🗄️ Database path: ${this.dbPath}`);
     }
 
     /**
@@ -364,27 +367,30 @@ class DatabaseManager {
         return new Promise((resolve, reject) => {
             const sql = `
                 INSERT INTO projects (
-                    customer_id, customer_name, project_name, project_type, status, 
-                    priority, description, start_date, end_date, budget, 
-                    quote_number, po_number, manager, team_members, notes
+                    name, customer_id, customer_name, type, status, 
+                    priority, budget, actual_cost, start_date, target_date,
+                    completion_date, description, quote_number, po_number, 
+                    project_manager, technical_lead, notes
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
             const params = [
+                projectData.name,
                 projectData.customer_id,
                 projectData.customer_name,
-                projectData.project_name,
-                projectData.project_type,
-                projectData.status || 'planning',
+                projectData.type,
+                projectData.status || 'active',
                 projectData.priority || 'medium',
-                projectData.description,
-                projectData.start_date,
-                projectData.end_date,
                 projectData.budget,
+                projectData.actual_cost,
+                projectData.start_date,
+                projectData.target_date,
+                projectData.completion_date,
+                projectData.description,
                 projectData.quote_number,
                 projectData.po_number,
-                projectData.manager,
-                projectData.team_members,
+                projectData.project_manager,
+                projectData.technical_lead,
                 projectData.notes
             ];
             
@@ -405,27 +411,31 @@ class DatabaseManager {
         return new Promise((resolve, reject) => {
             const sql = `
                 UPDATE projects 
-                SET customer_id = ?, customer_name = ?, project_name = ?, project_type = ?, 
-                    status = ?, priority = ?, description = ?, start_date = ?, end_date = ?, 
-                    budget = ?, quote_number = ?, po_number = ?, manager = ?, 
-                    team_members = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+                SET name = ?, customer_id = ?, customer_name = ?, type = ?, 
+                    status = ?, priority = ?, budget = ?, actual_cost = ?, 
+                    start_date = ?, target_date = ?, completion_date = ?, 
+                    description = ?, quote_number = ?, po_number = ?, 
+                    project_manager = ?, technical_lead = ?, notes = ?, 
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
             `;
             const params = [
+                projectData.name,
                 projectData.customer_id,
                 projectData.customer_name,
-                projectData.project_name,
-                projectData.project_type,
+                projectData.type,
                 projectData.status,
                 projectData.priority,
-                projectData.description,
-                projectData.start_date,
-                projectData.end_date,
                 projectData.budget,
+                projectData.actual_cost,
+                projectData.start_date,
+                projectData.target_date,
+                projectData.completion_date,
+                projectData.description,
                 projectData.quote_number,
                 projectData.po_number,
-                projectData.manager,
-                projectData.team_members,
+                projectData.project_manager,
+                projectData.technical_lead,
                 projectData.notes,
                 id
             ];
