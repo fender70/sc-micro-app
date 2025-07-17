@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -16,32 +16,50 @@ class DatabaseManager {
      * Initialize the database connection and create tables
      */
     initialize() {
-        try {
-            // Create database directory if it doesn't exist
-            const dbDir = path.dirname(this.dbPath);
-            if (!fs.existsSync(dbDir)) {
-                fs.mkdirSync(dbDir, { recursive: true });
-            }
+        return new Promise((resolve, reject) => {
+            try {
+                // Create database directory if it doesn't exist
+                const dbDir = path.dirname(this.dbPath);
+                if (!fs.existsSync(dbDir)) {
+                    fs.mkdirSync(dbDir, { recursive: true });
+                }
 
-            // Connect to SQLite database
-            this.db = new Database(this.dbPath);
-            
-            // Enable foreign keys
-            this.db.pragma('foreign_keys = ON');
-            
-            // Read and execute schema
-            const schemaPath = path.join(__dirname, 'schema.sql');
-            const schema = fs.readFileSync(schemaPath, 'utf8');
-            
-            // Execute schema statements
-            this.db.exec(schema);
-            
-            console.log('✅ Database initialized successfully');
-            return true;
-        } catch (error) {
-            console.error('❌ Database initialization failed:', error);
-            return false;
-        }
+                // Connect to SQLite database
+                this.db = new sqlite3.Database(this.dbPath, (err) => {
+                    if (err) {
+                        console.error('❌ Database connection failed:', err);
+                        reject(err);
+                        return;
+                    }
+
+                    // Enable foreign keys
+                    this.db.run('PRAGMA foreign_keys = ON', (err) => {
+                        if (err) {
+                            console.error('❌ Failed to enable foreign keys:', err);
+                        }
+
+                        // Read and execute schema
+                        const schemaPath = path.join(__dirname, 'schema.sql');
+                        const schema = fs.readFileSync(schemaPath, 'utf8');
+                        
+                        // Execute schema statements
+                        this.db.exec(schema, (err) => {
+                            if (err) {
+                                console.error('❌ Database schema execution failed:', err);
+                                reject(err);
+                                return;
+                            }
+                            
+                            console.log('✅ Database initialized successfully');
+                            resolve(true);
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error('❌ Database initialization failed:', error);
+                reject(error);
+            }
+        });
     }
 
     /**
@@ -68,298 +86,449 @@ class DatabaseManager {
      * Get all customers
      */
     getCustomers() {
-        const stmt = this.db.prepare('SELECT * FROM customers ORDER BY name');
-        return stmt.all();
+        return new Promise((resolve, reject) => {
+            this.db.all('SELECT * FROM customers ORDER BY name', (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
     }
 
     /**
      * Get customer by ID
      */
     getCustomerById(id) {
-        const stmt = this.db.prepare('SELECT * FROM customers WHERE id = ?');
-        return stmt.get(id);
+        return new Promise((resolve, reject) => {
+            this.db.get('SELECT * FROM customers WHERE id = ?', [id], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
     }
 
     /**
      * Create new customer
      */
     createCustomer(customerData) {
-        const stmt = this.db.prepare(`
-            INSERT INTO customers (name, tier, contact, email, phone, address)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `);
-        const result = stmt.run(
-            customerData.name,
-            customerData.tier || 'Bronze',
-            customerData.contact || '',
-            customerData.email || '',
-            customerData.phone || '',
-            customerData.address || ''
-        );
-        return result.lastInsertRowid;
+        return new Promise((resolve, reject) => {
+            const sql = `
+                INSERT INTO customers (name, tier, contact, email, phone, address)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+            const params = [
+                customerData.name,
+                customerData.tier || 'Bronze',
+                customerData.contact || '',
+                customerData.email || '',
+                customerData.phone || '',
+                customerData.address || ''
+            ];
+            
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            });
+        });
     }
 
     /**
      * Update customer
      */
     updateCustomer(id, customerData) {
-        const stmt = this.db.prepare(`
-            UPDATE customers 
-            SET name = ?, tier = ?, contact = ?, email = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `);
-        return stmt.run(
-            customerData.name,
-            customerData.tier,
-            customerData.contact,
-            customerData.email,
-            customerData.phone,
-            customerData.address,
-            id
-        );
+        return new Promise((resolve, reject) => {
+            const sql = `
+                UPDATE customers 
+                SET name = ?, tier = ?, contact = ?, email = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `;
+            const params = [
+                customerData.name,
+                customerData.tier,
+                customerData.contact,
+                customerData.email,
+                customerData.phone,
+                customerData.address,
+                id
+            ];
+            
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ changes: this.changes });
+                }
+            });
+        });
     }
 
     /**
      * Delete customer
      */
     deleteCustomer(id) {
-        const stmt = this.db.prepare('DELETE FROM customers WHERE id = ?');
-        return stmt.run(id);
+        return new Promise((resolve, reject) => {
+            this.db.run('DELETE FROM customers WHERE id = ?', [id], function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ changes: this.changes });
+                }
+            });
+        });
     }
 
     /**
      * Get all work requests
      */
     getWorkRequests() {
-        const stmt = this.db.prepare(`
-            SELECT wr.*, c.name as customer_name 
-            FROM work_requests wr 
-            LEFT JOIN customers c ON wr.customer_id = c.id 
-            ORDER BY wr.created_date DESC
-        `);
-        return stmt.all();
+        return new Promise((resolve, reject) => {
+            const sql = `
+                SELECT wr.*, c.name as customer_name 
+                FROM work_requests wr 
+                LEFT JOIN customers c ON wr.customer_id = c.id 
+                ORDER BY wr.created_date DESC
+            `;
+            this.db.all(sql, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
     }
 
     /**
      * Get work request by ID
      */
     getWorkRequestById(id) {
-        const stmt = this.db.prepare(`
-            SELECT wr.*, c.name as customer_name 
-            FROM work_requests wr 
-            LEFT JOIN customers c ON wr.customer_id = c.id 
-            WHERE wr.id = ?
-        `);
-        return stmt.get(id);
+        return new Promise((resolve, reject) => {
+            const sql = `
+                SELECT wr.*, c.name as customer_name 
+                FROM work_requests wr 
+                LEFT JOIN customers c ON wr.customer_id = c.id 
+                WHERE wr.id = ?
+            `;
+            this.db.get(sql, [id], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
     }
 
     /**
      * Create new work request
      */
     createWorkRequest(workRequestData) {
-        const stmt = this.db.prepare(`
-            INSERT INTO work_requests (
-                customer_id, customer_name, project_type, status, priority, 
-                description, target_date, quote_number, po_number, budget
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-        const result = stmt.run(
-            workRequestData.customer_id,
-            workRequestData.customer_name,
-            workRequestData.project_type,
-            workRequestData.status || 'pending',
-            workRequestData.priority || 'medium',
-            workRequestData.description,
-            workRequestData.target_date,
-            workRequestData.quote_number,
-            workRequestData.po_number,
-            workRequestData.budget
-        );
-        return result.lastInsertRowid;
+        return new Promise((resolve, reject) => {
+            const sql = `
+                INSERT INTO work_requests (
+                    customer_id, customer_name, project_type, status, priority, 
+                    description, target_date, quote_number, po_number, budget
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+            const params = [
+                workRequestData.customer_id,
+                workRequestData.customer_name,
+                workRequestData.project_type,
+                workRequestData.status || 'pending',
+                workRequestData.priority || 'medium',
+                workRequestData.description,
+                workRequestData.target_date,
+                workRequestData.quote_number,
+                workRequestData.po_number,
+                workRequestData.budget
+            ];
+            
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            });
+        });
     }
 
     /**
      * Update work request
      */
     updateWorkRequest(id, workRequestData) {
-        const stmt = this.db.prepare(`
-            UPDATE work_requests 
-            SET customer_id = ?, customer_name = ?, project_type = ?, status = ?, 
-                priority = ?, description = ?, target_date = ?, quote_number = ?, 
-                po_number = ?, budget = ?, actual_cost = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `);
-        return stmt.run(
-            workRequestData.customer_id,
-            workRequestData.customer_name,
-            workRequestData.project_type,
-            workRequestData.status,
-            workRequestData.priority,
-            workRequestData.description,
-            workRequestData.target_date,
-            workRequestData.quote_number,
-            workRequestData.po_number,
-            workRequestData.budget,
-            workRequestData.actual_cost,
-            workRequestData.notes,
-            id
-        );
+        return new Promise((resolve, reject) => {
+            const sql = `
+                UPDATE work_requests 
+                SET customer_id = ?, customer_name = ?, project_type = ?, status = ?, 
+                    priority = ?, description = ?, target_date = ?, quote_number = ?, 
+                    po_number = ?, budget = ?, actual_cost = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `;
+            const params = [
+                workRequestData.customer_id,
+                workRequestData.customer_name,
+                workRequestData.project_type,
+                workRequestData.status,
+                workRequestData.priority,
+                workRequestData.description,
+                workRequestData.target_date,
+                workRequestData.quote_number,
+                workRequestData.po_number,
+                workRequestData.budget,
+                workRequestData.actual_cost,
+                workRequestData.notes,
+                id
+            ];
+            
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ changes: this.changes });
+                }
+            });
+        });
     }
 
     /**
      * Delete work request
      */
     deleteWorkRequest(id) {
-        const stmt = this.db.prepare('DELETE FROM work_requests WHERE id = ?');
-        return stmt.run(id);
+        return new Promise((resolve, reject) => {
+            this.db.run('DELETE FROM work_requests WHERE id = ?', [id], function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ changes: this.changes });
+                }
+            });
+        });
     }
 
     /**
      * Get all projects
      */
     getProjects() {
-        const stmt = this.db.prepare(`
-            SELECT p.*, c.name as customer_name 
-            FROM projects p 
-            LEFT JOIN customers c ON p.customer_id = c.id 
-            ORDER BY p.start_date DESC
-        `);
-        return stmt.all();
+        return new Promise((resolve, reject) => {
+            const sql = `
+                SELECT p.*, c.name as customer_name 
+                FROM projects p 
+                LEFT JOIN customers c ON p.customer_id = c.id 
+                ORDER BY p.start_date DESC
+            `;
+            this.db.all(sql, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
     }
 
     /**
      * Get project by ID
      */
     getProjectById(id) {
-        const stmt = this.db.prepare(`
-            SELECT p.*, c.name as customer_name 
-            FROM projects p 
-            LEFT JOIN customers c ON p.customer_id = c.id 
-            WHERE p.id = ?
-        `);
-        return stmt.get(id);
+        return new Promise((resolve, reject) => {
+            const sql = `
+                SELECT p.*, c.name as customer_name 
+                FROM projects p 
+                LEFT JOIN customers c ON p.customer_id = c.id 
+                WHERE p.id = ?
+            `;
+            this.db.get(sql, [id], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
     }
 
     /**
      * Create new project
      */
     createProject(projectData) {
-        const stmt = this.db.prepare(`
-            INSERT INTO projects (
-                name, customer_id, customer_name, type, status, priority, 
-                budget, start_date, target_date, description, quote_number, 
-                po_number, project_manager, technical_lead, notes
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-        const result = stmt.run(
-            projectData.name,
-            projectData.customer_id,
-            projectData.customer_name,
-            projectData.type,
-            projectData.status || 'active',
-            projectData.priority || 'medium',
-            projectData.budget,
-            projectData.start_date,
-            projectData.target_date,
-            projectData.description,
-            projectData.quote_number,
-            projectData.po_number,
-            projectData.project_manager,
-            projectData.technical_lead,
-            projectData.notes
-        );
-        return result.lastInsertRowid;
+        return new Promise((resolve, reject) => {
+            const sql = `
+                INSERT INTO projects (
+                    customer_id, customer_name, project_name, project_type, status, 
+                    priority, description, start_date, end_date, budget, 
+                    quote_number, po_number, manager, team_members, notes
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+            const params = [
+                projectData.customer_id,
+                projectData.customer_name,
+                projectData.project_name,
+                projectData.project_type,
+                projectData.status || 'planning',
+                projectData.priority || 'medium',
+                projectData.description,
+                projectData.start_date,
+                projectData.end_date,
+                projectData.budget,
+                projectData.quote_number,
+                projectData.po_number,
+                projectData.manager,
+                projectData.team_members,
+                projectData.notes
+            ];
+            
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            });
+        });
     }
 
     /**
      * Update project
      */
     updateProject(id, projectData) {
-        const stmt = this.db.prepare(`
-            UPDATE projects 
-            SET name = ?, customer_id = ?, customer_name = ?, type = ?, status = ?, 
-                priority = ?, budget = ?, actual_cost = ?, start_date = ?, 
-                target_date = ?, completion_date = ?, description = ?, quote_number = ?,
-                po_number = ?, project_manager = ?, technical_lead = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `);
-        return stmt.run(
-            projectData.name,
-            projectData.customer_id,
-            projectData.customer_name,
-            projectData.type,
-            projectData.status,
-            projectData.priority,
-            projectData.budget,
-            projectData.actual_cost,
-            projectData.start_date,
-            projectData.target_date,
-            projectData.completion_date,
-            projectData.description,
-            projectData.quote_number,
-            projectData.po_number,
-            projectData.project_manager,
-            projectData.technical_lead,
-            projectData.notes,
-            id
-        );
+        return new Promise((resolve, reject) => {
+            const sql = `
+                UPDATE projects 
+                SET customer_id = ?, customer_name = ?, project_name = ?, project_type = ?, 
+                    status = ?, priority = ?, description = ?, start_date = ?, end_date = ?, 
+                    budget = ?, quote_number = ?, po_number = ?, manager = ?, 
+                    team_members = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `;
+            const params = [
+                projectData.customer_id,
+                projectData.customer_name,
+                projectData.project_name,
+                projectData.project_type,
+                projectData.status,
+                projectData.priority,
+                projectData.description,
+                projectData.start_date,
+                projectData.end_date,
+                projectData.budget,
+                projectData.quote_number,
+                projectData.po_number,
+                projectData.manager,
+                projectData.team_members,
+                projectData.notes,
+                id
+            ];
+            
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ changes: this.changes });
+                }
+            });
+        });
     }
 
     /**
      * Delete project
      */
     deleteProject(id) {
-        const stmt = this.db.prepare('DELETE FROM projects WHERE id = ?');
-        return stmt.run(id);
+        return new Promise((resolve, reject) => {
+            this.db.run('DELETE FROM projects WHERE id = ?', [id], function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ changes: this.changes });
+                }
+            });
+        });
     }
 
     /**
      * Get dashboard metrics
      */
     getDashboardMetrics() {
-        // Calculate real-time metrics
-        const totalWorkRequests = this.db.prepare('SELECT COUNT(*) as count FROM work_requests').get().count;
-        const pendingRequests = this.db.prepare("SELECT COUNT(*) as count FROM work_requests WHERE status = 'pending'").get().count;
-        const completedRequests = this.db.prepare("SELECT COUNT(*) as count FROM work_requests WHERE status = 'completed'").get().count;
-        const completionRate = totalWorkRequests > 0 ? (completedRequests / totalWorkRequests) : 0;
-        
-        const totalRevenue = this.db.prepare('SELECT SUM(budget) as total FROM work_requests WHERE budget IS NOT NULL').get().total || 0;
-        const activeCustomers = this.db.prepare("SELECT COUNT(DISTINCT customer_id) as count FROM work_requests WHERE status IN ('pending', 'in-progress')").get().count;
-        const highPriorityItems = this.db.prepare("SELECT COUNT(*) as count FROM work_requests WHERE priority = 'high' AND status IN ('pending', 'in-progress')").get().count;
-
-        // Calculate average project time (simplified)
-        const averageProjectTime = 45; // This could be calculated from actual data
-
-        return {
-            total_work_requests: totalWorkRequests,
-            pending_requests: pendingRequests,
-            completed_requests: completedRequests,
-            completion_rate: completionRate,
-            average_project_time: averageProjectTime,
-            total_revenue: totalRevenue,
-            active_customers: activeCustomers,
-            high_priority_items: highPriorityItems
-        };
+        return new Promise((resolve, reject) => {
+            const metrics = {};
+            
+            // Get customer count
+            this.db.get('SELECT COUNT(*) as count FROM customers', (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                metrics.totalCustomers = result.count;
+                
+                // Get work request count
+                this.db.get('SELECT COUNT(*) as count FROM work_requests', (err, result) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    metrics.totalWorkRequests = result.count;
+                    
+                    // Get project count
+                    this.db.get('SELECT COUNT(*) as count FROM projects', (err, result) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        metrics.totalProjects = result.count;
+                        
+                        // Get pending work requests
+                        this.db.get('SELECT COUNT(*) as count FROM work_requests WHERE status = "pending"', (err, result) => {
+                            if (err) {
+                                reject(err);
+                                return;
+                            }
+                            metrics.pendingWorkRequests = result.count;
+                            
+                            // Get active projects
+                            this.db.get('SELECT COUNT(*) as count FROM projects WHERE status = "active"', (err, result) => {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
+                                metrics.activeProjects = result.count;
+                                
+                                resolve(metrics);
+                            });
+                        });
+                    });
+                });
+            });
+        });
     }
 
     /**
      * Backup database
      */
     backup(backupPath) {
-        if (!this.db) {
-            throw new Error('Database not initialized');
-        }
-        
-        const backup = new Database(backupPath);
-        this.db.backup(backup);
-        backup.close();
-        console.log(`✅ Database backed up to: ${backupPath}`);
+        return new Promise((resolve, reject) => {
+            const backupDb = new sqlite3.Database(backupPath);
+            this.db.backup(backupDb, (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    backupDb.close();
+                    resolve(true);
+                }
+            });
+        });
     }
 }
 
-// Create singleton instance
+// Create and export singleton instance
 const dbManager = new DatabaseManager();
-
 export default dbManager; 

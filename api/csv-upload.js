@@ -81,21 +81,21 @@ async function processWorkOrders(csvData) {
 
             // Check if work request already exists (by quote number)
             if (workRequestData.quote_number) {
-                const existingRequests = dbManager.getWorkRequests();
+                const existingRequests = await dbManager.getWorkRequests();
                 const existing = existingRequests.find(r => r.quote_number === workRequestData.quote_number);
                 
                 if (existing) {
                     // Update existing work request
-                    dbManager.updateWorkRequest(existing.id, workRequestData);
+                    await dbManager.updateWorkRequest(existing.id, workRequestData);
                     results.updated++;
                 } else {
                     // Create new work request
-                    dbManager.createWorkRequest(workRequestData);
+                    await dbManager.createWorkRequest(workRequestData);
                     results.added++;
                 }
             } else {
                 // Create new work request without quote number
-                dbManager.createWorkRequest(workRequestData);
+                await dbManager.createWorkRequest(workRequestData);
                 results.added++;
             }
         } catch (error) {
@@ -144,18 +144,18 @@ async function processProjects(csvData) {
             projectData.customer_name = customer.name;
 
             // Check if project already exists (by name and customer)
-            const existingProjects = dbManager.getProjects();
+            const existingProjects = await dbManager.getProjects();
             const existing = existingProjects.find(p => 
                 p.name === projectData.name && p.customer_id === projectData.customer_id
             );
             
             if (existing) {
                 // Update existing project
-                dbManager.updateProject(existing.id, projectData);
+                await dbManager.updateProject(existing.id, projectData);
                 results.updated++;
             } else {
                 // Create new project
-                dbManager.createProject(projectData);
+                await dbManager.createProject(projectData);
                 results.added++;
             }
         } catch (error) {
@@ -174,12 +174,12 @@ async function findOrCreateCustomer(customerName) {
         throw new Error('Customer name is required');
     }
 
-    const customers = dbManager.getCustomers();
+    const customers = await dbManager.getCustomers();
     let customer = customers.find(c => c.name.toLowerCase() === customerName.toLowerCase());
     
     if (!customer) {
         // Create new customer with default values
-        const customerId = dbManager.createCustomer({
+        const customerId = await dbManager.createCustomer({
             name: customerName,
             tier: 'Bronze',
             contact: '',
@@ -187,7 +187,7 @@ async function findOrCreateCustomer(customerName) {
             phone: '',
             address: ''
         });
-        customer = dbManager.getCustomerById(customerId);
+        customer = await dbManager.getCustomerById(customerId);
     }
     
     return customer;

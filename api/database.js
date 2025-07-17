@@ -5,12 +5,14 @@ import dbManager from '../database/db.js';
 const router = express.Router();
 
 // Initialize database on startup
-dbManager.initialize();
+dbManager.initialize().catch(error => {
+    console.error('Failed to initialize database:', error);
+});
 
 // Customers API endpoints
-router.get('/customers', cors(), (req, res) => {
+router.get('/customers', cors(), async (req, res) => {
     try {
-        const customers = dbManager.getCustomers();
+        const customers = await dbManager.getCustomers();
         res.json(customers);
     } catch (error) {
         console.error('Error fetching customers:', error);
@@ -18,9 +20,9 @@ router.get('/customers', cors(), (req, res) => {
     }
 });
 
-router.get('/customers/:id', cors(), (req, res) => {
+router.get('/customers/:id', cors(), async (req, res) => {
     try {
-        const customer = dbManager.getCustomerById(parseInt(req.params.id));
+        const customer = await dbManager.getCustomerById(parseInt(req.params.id));
         if (customer) {
             res.json(customer);
         } else {
@@ -32,15 +34,15 @@ router.get('/customers/:id', cors(), (req, res) => {
     }
 });
 
-router.post('/customers', cors(), (req, res) => {
+router.post('/customers', cors(), async (req, res) => {
     try {
         // Validate required fields
         if (!req.body.name) {
             return res.status(400).json({ error: 'Customer name is required' });
         }
         
-        const customerId = dbManager.createCustomer(req.body);
-        const customer = dbManager.getCustomerById(customerId);
+        const customerId = await dbManager.createCustomer(req.body);
+        const customer = await dbManager.getCustomerById(customerId);
         res.status(201).json(customer);
     } catch (error) {
         console.error('Error creating customer:', error);
@@ -51,11 +53,11 @@ router.post('/customers', cors(), (req, res) => {
     }
 });
 
-router.put('/customers/:id', cors(), (req, res) => {
+router.put('/customers/:id', cors(), async (req, res) => {
     try {
-        const result = dbManager.updateCustomer(parseInt(req.params.id), req.body);
+        const result = await dbManager.updateCustomer(parseInt(req.params.id), req.body);
         if (result.changes > 0) {
-            const customer = dbManager.getCustomerById(parseInt(req.params.id));
+            const customer = await dbManager.getCustomerById(parseInt(req.params.id));
             res.json(customer);
         } else {
             res.status(404).json({ error: 'Customer not found' });
@@ -66,9 +68,9 @@ router.put('/customers/:id', cors(), (req, res) => {
     }
 });
 
-router.delete('/customers/:id', cors(), (req, res) => {
+router.delete('/customers/:id', cors(), async (req, res) => {
     try {
-        const result = dbManager.deleteCustomer(parseInt(req.params.id));
+        const result = await dbManager.deleteCustomer(parseInt(req.params.id));
         if (result.changes > 0) {
             res.json({ message: 'Customer deleted successfully' });
         } else {
@@ -81,9 +83,9 @@ router.delete('/customers/:id', cors(), (req, res) => {
 });
 
 // Work Requests API endpoints
-router.get('/work-requests', cors(), (req, res) => {
+router.get('/work-requests', cors(), async (req, res) => {
     try {
-        const workRequests = dbManager.getWorkRequests();
+        const workRequests = await dbManager.getWorkRequests();
         res.json(workRequests);
     } catch (error) {
         console.error('Error fetching work requests:', error);
@@ -91,9 +93,9 @@ router.get('/work-requests', cors(), (req, res) => {
     }
 });
 
-router.get('/work-requests/:id', cors(), (req, res) => {
+router.get('/work-requests/:id', cors(), async (req, res) => {
     try {
-        const workRequest = dbManager.getWorkRequestById(parseInt(req.params.id));
+        const workRequest = await dbManager.getWorkRequestById(parseInt(req.params.id));
         if (workRequest) {
             res.json(workRequest);
         } else {
@@ -105,10 +107,10 @@ router.get('/work-requests/:id', cors(), (req, res) => {
     }
 });
 
-router.post('/work-requests', cors(), (req, res) => {
+router.post('/work-requests', cors(), async (req, res) => {
     try {
-        const workRequestId = dbManager.createWorkRequest(req.body);
-        const workRequest = dbManager.getWorkRequestById(workRequestId);
+        const workRequestId = await dbManager.createWorkRequest(req.body);
+        const workRequest = await dbManager.getWorkRequestById(workRequestId);
         res.status(201).json(workRequest);
     } catch (error) {
         console.error('Error creating work request:', error);
@@ -116,11 +118,11 @@ router.post('/work-requests', cors(), (req, res) => {
     }
 });
 
-router.put('/work-requests/:id', cors(), (req, res) => {
+router.put('/work-requests/:id', cors(), async (req, res) => {
     try {
-        const result = dbManager.updateWorkRequest(parseInt(req.params.id), req.body);
+        const result = await dbManager.updateWorkRequest(parseInt(req.params.id), req.body);
         if (result.changes > 0) {
-            const workRequest = dbManager.getWorkRequestById(parseInt(req.params.id));
+            const workRequest = await dbManager.getWorkRequestById(parseInt(req.params.id));
             res.json(workRequest);
         } else {
             res.status(404).json({ error: 'Work request not found' });
@@ -131,9 +133,9 @@ router.put('/work-requests/:id', cors(), (req, res) => {
     }
 });
 
-router.delete('/work-requests/:id', cors(), (req, res) => {
+router.delete('/work-requests/:id', cors(), async (req, res) => {
     try {
-        const result = dbManager.deleteWorkRequest(parseInt(req.params.id));
+        const result = await dbManager.deleteWorkRequest(parseInt(req.params.id));
         if (result.changes > 0) {
             res.json({ message: 'Work request deleted successfully' });
         } else {
@@ -146,9 +148,9 @@ router.delete('/work-requests/:id', cors(), (req, res) => {
 });
 
 // Projects API endpoints
-router.get('/projects', cors(), (req, res) => {
+router.get('/projects', cors(), async (req, res) => {
     try {
-        const projects = dbManager.getProjects();
+        const projects = await dbManager.getProjects();
         res.json(projects);
     } catch (error) {
         console.error('Error fetching projects:', error);
@@ -156,9 +158,9 @@ router.get('/projects', cors(), (req, res) => {
     }
 });
 
-router.get('/projects/:id', cors(), (req, res) => {
+router.get('/projects/:id', cors(), async (req, res) => {
     try {
-        const project = dbManager.getProjectById(parseInt(req.params.id));
+        const project = await dbManager.getProjectById(parseInt(req.params.id));
         if (project) {
             res.json(project);
         } else {
@@ -170,10 +172,10 @@ router.get('/projects/:id', cors(), (req, res) => {
     }
 });
 
-router.post('/projects', cors(), (req, res) => {
+router.post('/projects', cors(), async (req, res) => {
     try {
-        const projectId = dbManager.createProject(req.body);
-        const project = dbManager.getProjectById(projectId);
+        const projectId = await dbManager.createProject(req.body);
+        const project = await dbManager.getProjectById(projectId);
         res.status(201).json(project);
     } catch (error) {
         console.error('Error creating project:', error);
@@ -181,11 +183,11 @@ router.post('/projects', cors(), (req, res) => {
     }
 });
 
-router.put('/projects/:id', cors(), (req, res) => {
+router.put('/projects/:id', cors(), async (req, res) => {
     try {
-        const result = dbManager.updateProject(parseInt(req.params.id), req.body);
+        const result = await dbManager.updateProject(parseInt(req.params.id), req.body);
         if (result.changes > 0) {
-            const project = dbManager.getProjectById(parseInt(req.params.id));
+            const project = await dbManager.getProjectById(parseInt(req.params.id));
             res.json(project);
         } else {
             res.status(404).json({ error: 'Project not found' });
@@ -196,9 +198,9 @@ router.put('/projects/:id', cors(), (req, res) => {
     }
 });
 
-router.delete('/projects/:id', cors(), (req, res) => {
+router.delete('/projects/:id', cors(), async (req, res) => {
     try {
-        const result = dbManager.deleteProject(parseInt(req.params.id));
+        const result = await dbManager.deleteProject(parseInt(req.params.id));
         if (result.changes > 0) {
             res.json({ message: 'Project deleted successfully' });
         } else {
@@ -211,9 +213,9 @@ router.delete('/projects/:id', cors(), (req, res) => {
 });
 
 // Dashboard metrics endpoint
-router.get('/dashboard/metrics', cors(), (req, res) => {
+router.get('/dashboard/metrics', cors(), async (req, res) => {
     try {
-        const metrics = dbManager.getDashboardMetrics();
+        const metrics = await dbManager.getDashboardMetrics();
         res.json(metrics);
     } catch (error) {
         console.error('Error fetching dashboard metrics:', error);
@@ -222,10 +224,10 @@ router.get('/dashboard/metrics', cors(), (req, res) => {
 });
 
 // Database backup endpoint
-router.post('/database/backup', cors(), (req, res) => {
+router.post('/database/backup', cors(), async (req, res) => {
     try {
         const backupPath = `./database/backup_${Date.now()}.db`;
-        dbManager.backup(backupPath);
+        await dbManager.backup(backupPath);
         res.json({ message: 'Database backed up successfully', backupPath });
     } catch (error) {
         console.error('Error backing up database:', error);
