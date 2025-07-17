@@ -1,5 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import assistantRouter from './assistant.js';
+import databaseRouter from './database.js';
+import csvUploadRouter from './csv-upload.js';
+import dbManager from '../database/db.js';
 
 const app = express();
 
@@ -8,271 +12,156 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// In-memory data storage for demo
-let customers = [
-  {
-    _id: '1',
-    name: 'John Smith',
-    company: 'TechCorp Industries',
-    email: 'john.smith@techcorp.com',
-    phone: '(555) 123-4567',
-    address: '123 Tech Street, Silicon Valley, CA 94025',
-    notes: 'Premium customer with high-value projects',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '2',
-    name: 'Sarah Johnson',
-    company: 'Innovate Solutions',
-    email: 'sarah.j@innovate.com',
-    phone: '(555) 234-5678',
-    address: '456 Innovation Ave, Austin, TX 73301',
-    notes: 'Focus on wirebond and die attach projects',
-    createdAt: '2024-02-20T14:30:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '3',
-    name: 'Mike Chen',
-    company: 'Startup.io',
-    email: 'mike.chen@startup.io',
-    phone: '(555) 345-6789',
-    address: '789 Startup Blvd, Seattle, WA 98101',
-    notes: 'New customer with potential for growth',
-    createdAt: '2024-03-10T09:15:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  }
-];
+// Assistant routes
+app.use('/api/assistant', assistantRouter);
 
-let workRequests = [
-  {
-    _id: '1',
-    customer: customers[0],
-    workRequestDetails: 'Wirebond assembly for 100 units of RF amplifier chips',
-    quoteNumber: 'Q-2024-001',
-    poNumber: 'PO-2024-001',
-    invoiceNumber: 'INV-2024-001',
-    shipDate: '2024-08-15',
-    scMicroReport: 'https://example.com/report1.pdf',
-    status: 'completed',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '2',
-    customer: customers[1],
-    workRequestDetails: 'Die attach process for MEMS sensor packaging',
-    quoteNumber: 'Q-2024-002',
-    poNumber: 'PO-2024-002',
-    invoiceNumber: 'INV-2024-002',
-    shipDate: '2024-08-20',
-    scMicroReport: 'https://example.com/report2.pdf',
-    status: 'in-progress',
-    createdAt: '2024-02-20T14:30:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '3',
-    customer: customers[2],
-    workRequestDetails: 'Flip chip assembly for IoT device prototype',
-    quoteNumber: 'Q-2024-003',
-    poNumber: 'PO-2024-003',
-    invoiceNumber: '',
-    shipDate: '2024-09-01',
-    scMicroReport: '',
-    status: 'pending',
-    createdAt: '2024-03-10T09:15:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '4',
-    customer: customers[0],
-    workRequestDetails: 'Encapsulation process for automotive sensor module',
-    quoteNumber: 'Q-2024-004',
-    poNumber: 'PO-2024-004',
-    invoiceNumber: 'INV-2024-004',
-    shipDate: '2024-07-30',
-    scMicroReport: 'https://example.com/report4.pdf',
-    status: 'shipped',
-    createdAt: '2024-04-05T11:20:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '5',
-    customer: customers[1],
-    workRequestDetails: 'Testing and validation for medical device components',
-    quoteNumber: 'Q-2024-005',
-    poNumber: 'PO-2024-005',
-    invoiceNumber: '',
-    shipDate: '2024-09-15',
-    scMicroReport: '',
-    status: 'quoted',
-    createdAt: '2024-05-12T16:45:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  }
-];
+// Database routes
+app.use('/api/database', databaseRouter);
 
-let projects = [
-  {
-    _id: '1',
-    customer: customers[0],
-    projectName: 'RF Amplifier Assembly Project',
-    projectDescription: 'Complete assembly and testing of RF amplifier chips for telecommunications',
-    projectType: 'wirebond',
-    status: 'completed',
-    priority: 'high',
-    budget: 25000,
-    actualCost: 23000,
-    startDate: '2024-01-15',
-    targetDate: '2024-08-15',
-    quoteNumber: 'Q-2024-001',
-    poNumber: 'PO-2024-001',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '2',
-    customer: customers[1],
-    projectName: 'MEMS Sensor Packaging',
-    projectDescription: 'Advanced packaging solution for MEMS sensors with die attach process',
-    projectType: 'die-attach',
-    status: 'active',
-    priority: 'medium',
-    budget: 18000,
-    actualCost: 12000,
-    startDate: '2024-02-20',
-    targetDate: '2024-08-20',
-    quoteNumber: 'Q-2024-002',
-    poNumber: 'PO-2024-002',
-    createdAt: '2024-02-20T14:30:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  },
-  {
-    _id: '3',
-    customer: customers[2],
-    projectName: 'IoT Device Prototype',
-    projectDescription: 'Flip chip assembly for next-generation IoT device prototype',
-    projectType: 'flip-chip',
-    status: 'planning',
-    priority: 'low',
-    budget: 15000,
-    actualCost: 0,
-    startDate: '2024-03-10',
-    targetDate: '2024-09-01',
-    quoteNumber: 'Q-2024-003',
-    poNumber: 'PO-2024-003',
-    createdAt: '2024-03-10T09:15:00Z',
-    updatedAt: '2024-07-15T10:00:00Z'
-  }
-];
+// CSV Upload routes
+app.use('/api/csv', csvUploadRouter);
 
-// Helper function to generate new IDs
-const generateId = () => Math.random().toString(36).substr(2, 9);
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'API server is working!',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      workRequests: '/api/workrequests',
+      customers: '/api/customers',
+      projects: '/api/projects',
+      assistant: '/api/assistant/chat'
+    }
+  });
+});
+
+// Initialize database manager
+dbManager.initialize();
 
 // Routes
 app.get('/api/workrequests', (req, res) => {
-  res.json(workRequests);
+  try {
+    const allWorkRequests = dbManager.getWorkRequests();
+    res.json(allWorkRequests);
+  } catch (error) {
+    console.error('Error in /api/workrequests:', error);
+    res.status(500).json({ error: 'Failed to get work requests', details: error.message });
+  }
 });
 
 app.post('/api/workrequests', (req, res) => {
-  const newWorkRequest = {
-    _id: generateId(),
-    ...req.body,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  workRequests.push(newWorkRequest);
-  res.status(201).json(newWorkRequest);
+  try {
+    const newWorkRequestId = dbManager.createWorkRequest(req.body);
+    const newWorkRequest = dbManager.getWorkRequestById(newWorkRequestId);
+    res.status(201).json(newWorkRequest);
+  } catch (error) {
+    console.error('Error creating work request:', error);
+    res.status(500).json({ error: 'Failed to create work request', details: error.message });
+  }
 });
 
 app.put('/api/workrequests/:id', (req, res) => {
-  const index = workRequests.findIndex(wr => wr._id === req.params.id);
-  if (index !== -1) {
-    workRequests[index] = { ...workRequests[index], ...req.body, updatedAt: new Date().toISOString() };
-    res.json(workRequests[index]);
-  } else {
-    res.status(404).json({ message: 'Work request not found' });
+  try {
+    dbManager.updateWorkRequest(req.params.id, req.body);
+    const updatedWorkRequest = dbManager.getWorkRequestById(req.params.id);
+    res.json(updatedWorkRequest);
+  } catch (error) {
+    console.error('Error updating work request:', error);
+    res.status(500).json({ error: 'Failed to update work request', details: error.message });
   }
 });
 
 app.delete('/api/workrequests/:id', (req, res) => {
-  const index = workRequests.findIndex(wr => wr._id === req.params.id);
-  if (index !== -1) {
-    workRequests.splice(index, 1);
+  try {
+    dbManager.deleteWorkRequest(req.params.id);
     res.status(204).send();
-  } else {
-    res.status(404).json({ message: 'Work request not found' });
+  } catch (error) {
+    console.error('Error deleting work request:', error);
+    res.status(500).json({ error: 'Failed to delete work request', details: error.message });
   }
 });
 
 app.get('/api/customers', (req, res) => {
-  res.json(customers);
+  try {
+    const allCustomers = dbManager.getCustomers();
+    res.json(allCustomers);
+  } catch (error) {
+    console.error('Error in /api/customers:', error);
+    res.status(500).json({ error: 'Failed to get customers', details: error.message });
+  }
 });
 
 app.post('/api/customers', (req, res) => {
-  const newCustomer = {
-    _id: generateId(),
-    ...req.body,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  customers.push(newCustomer);
-  res.status(201).json(newCustomer);
+  try {
+    const newCustomerId = dbManager.createCustomer(req.body);
+    const newCustomer = dbManager.getCustomerById(newCustomerId);
+    res.status(201).json(newCustomer);
+  } catch (error) {
+    console.error('Error creating customer:', error);
+    res.status(500).json({ error: 'Failed to create customer', details: error.message });
+  }
 });
 
 app.put('/api/customers/:id', (req, res) => {
-  const index = customers.findIndex(c => c._id === req.params.id);
-  if (index !== -1) {
-    customers[index] = { ...customers[index], ...req.body, updatedAt: new Date().toISOString() };
-    res.json(customers[index]);
-  } else {
-    res.status(404).json({ message: 'Customer not found' });
+  try {
+    dbManager.updateCustomer(req.params.id, req.body);
+    const updatedCustomer = dbManager.getCustomerById(req.params.id);
+    res.json(updatedCustomer);
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    res.status(500).json({ error: 'Failed to update customer', details: error.message });
   }
 });
 
 app.delete('/api/customers/:id', (req, res) => {
-  const index = customers.findIndex(c => c._id === req.params.id);
-  if (index !== -1) {
-    customers.splice(index, 1);
+  try {
+    dbManager.deleteCustomer(req.params.id);
     res.status(204).send();
-  } else {
-    res.status(404).json({ message: 'Customer not found' });
+  } catch (error) {
+    console.error('Error deleting customer:', error);
+    res.status(500).json({ error: 'Failed to delete customer', details: error.message });
   }
 });
 
 app.get('/api/projects', (req, res) => {
-  res.json(projects);
+  try {
+    const allProjects = dbManager.getProjects();
+    res.json(allProjects);
+  } catch (error) {
+    console.error('Error in /api/projects:', error);
+    res.status(500).json({ error: 'Failed to get projects', details: error.message });
+  }
 });
 
 app.post('/api/projects', (req, res) => {
-  const newProject = {
-    _id: generateId(),
-    ...req.body,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  projects.push(newProject);
-  res.status(201).json(newProject);
+  try {
+    const newProjectId = dbManager.createProject(req.body);
+    const newProject = dbManager.getProjectById(newProjectId);
+    res.status(201).json(newProject);
+  } catch (error) {
+    console.error('Error creating project:', error);
+    res.status(500).json({ error: 'Failed to create project', details: error.message });
+  }
 });
 
 app.put('/api/projects/:id', (req, res) => {
-  const index = projects.findIndex(p => p._id === req.params.id);
-  if (index !== -1) {
-    projects[index] = { ...projects[index], ...req.body, updatedAt: new Date().toISOString() };
-    res.json(projects[index]);
-  } else {
-    res.status(404).json({ message: 'Project not found' });
+  try {
+    dbManager.updateProject(req.params.id, req.body);
+    const updatedProject = dbManager.getProjectById(req.params.id);
+    res.json(updatedProject);
+  } catch (error) {
+    console.error('Error updating project:', error);
+    res.status(500).json({ error: 'Failed to update project', details: error.message });
   }
 });
 
 app.delete('/api/projects/:id', (req, res) => {
-  const index = projects.findIndex(p => p._id === req.params.id);
-  if (index !== -1) {
-    projects.splice(index, 1);
+  try {
+    dbManager.deleteProject(req.params.id);
     res.status(204).send();
-  } else {
-    res.status(404).json({ message: 'Project not found' });
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    res.status(500).json({ error: 'Failed to delete project', details: error.message });
   }
 });
 
@@ -285,31 +174,32 @@ app.use((err, req, res, next) => {
   });
 });
 
-// CSV routes
-app.post('/api/csv/upload', (req, res) => {
-  try {
-    // Mock CSV upload response
-    res.json({ 
-      message: 'CSV uploaded successfully (demo mode)',
-      processed: 5,
-      added: 3,
-      updated: 2
-    });
-  } catch (error) {
-    console.error('CSV upload error:', error);
-    res.status(500).json({ error: 'CSV upload failed' });
-  }
-});
+
 
 app.get('/api/csv/template', (req, res) => {
   try {
-    // Mock CSV template download
-    const csvContent = `Date Entered,Company Name,Contact,Status,Quote #,QTY,PO#,Invoice #,Amt Invoiced ($),Status2,Work Request Details
-2024-07-15,TechCorp Industries,John Smith,pending,Q-2024-006,50,PO-2024-006,,,Wirebond assembly for RF chips
-2024-07-15,Innovate Solutions,Sarah Johnson,in-progress,Q-2024-007,25,PO-2024-007,INV-2024-007,15000,Die attach for MEMS sensors`;
+    const { type } = req.query;
+    
+    let csvContent, filename;
+    
+    if (type === 'projects') {
+      // Projects template - matches Project Details format
+      csvContent = `SN,Customer,PIC Name,Quote #,PO#,Invoice #,Amount Invoiced ($),Completion Date,Photo,Project Information,Comments
+1,Open Light Photonics,Sheri Wang,QU-24733,INV-2536,INV-2536,"4,965.94",7-Jun,,"Manual remove the singulated die from wafer, Die attach with JM7000, Wirebond with 8 wires, Quantity: 100","QU24733 - Include epoxy price in quote"
+2,Qorvo,James Wang,QU-24732,,,,,,"Eutectic die attach, They will provide the die and heat spreader, Temperature: 340C, Quote Request for 100 and 200 quantity, Schedule: End of April","QU-24732 - Update quote for eutectic attach only"
+3,Semi Pac Reclaim,John Mackay,QU-24730,,INV-2521,"3,030.17",4/17/2025,,"Wirebond project. No Die attach, Materials are on-hand, 23 wires, Quantity: 147","QU-24730 - Completed project, revise quote for 18 wires only"`;
+      filename = 'projects-template.csv';
+    } else {
+      // Work orders template (default) - matches your actual CSV format
+      csvContent = `SN,Customer,PIC Name,Quote #,PO#,Invoice #,Amount Invoiced ($),Completion Date,Photo,Project Information,Comments
+1,TechCorp Industries,John Smith,QU-2024-001,PO-2024-001,INV-2024-001,"15,000.00",2024-07-15,,"Wirebond assembly for RF chips - 50 units","High priority project"
+2,Innovate Solutions,Sarah Johnson,QU-2024-002,PO-2024-002,,,2024-08-15,,"Die attach for MEMS sensors - 25 units","Pending material approval"
+3,Open Light Photonics,Sheri Wang,QU-2024-003,,,,"4,965.94",2024-06-07,,"Manual remove the singulated die from wafer, Die attach with JM7000, Wirebond with 8 wires, Quantity: 100","Include epoxy price in quote"`;
+      filename = 'work-orders-template.csv';
+    }
     
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="work-order-template.csv"');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(csvContent);
   } catch (error) {
     console.error('CSV template error:', error);
@@ -317,13 +207,5 @@ app.get('/api/csv/template', (req, res) => {
   }
 });
 
-// Export for Vercel serverless function
-export default app;
-
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-} 
+// Export the Express app
+export default app; 

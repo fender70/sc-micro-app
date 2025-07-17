@@ -24,7 +24,7 @@ const CustomerEditForm = ({ customers, onUpdateCustomer }) => {
   });
 
   useEffect(() => {
-    const customer = customers.find(c => c._id === id);
+    const customer = customers.find(c => c.id === parseInt(id));
     if (customer) {
       setFormData({
         name: customer.name || '',

@@ -9,52 +9,48 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    projectName: '',
-    projectDescription: '',
-    customer: '',
-    projectType: '',
+    name: '',
+    description: '',
+    customer_id: '',
+    type: '',
     status: 'planning',
     priority: 'medium',
     budget: '',
-    actualCost: '',
-    startDate: '',
-    targetDate: '',
-    completionDate: '',
-    projectManager: '',
-    technicalLead: '',
-    quoteNumber: '',
-    poNumber: '',
-    invoiceNumber: '',
-    amountInvoiced: '',
+    actual_cost: '',
+    start_date: '',
+    target_date: '',
+    completion_date: '',
+    project_manager: '',
+    technical_lead: '',
+    quote_number: '',
+    po_number: '',
     notes: ''
   });
 
+  const project = projects.find(p => p.id === parseInt(id));
   useEffect(() => {
-    const project = projects.find(p => p._id === id);
     if (project) {
       setFormData({
-        projectName: project.projectName || '',
-        projectDescription: project.projectDescription || '',
-        customer: project.customer?._id || '',
-        projectType: project.projectType || '',
+        name: project.name || '',
+        description: project.description || '',
+        customer_id: project.customer_id || '',
+        type: project.type || '',
         status: project.status || 'planning',
         priority: project.priority || 'medium',
         budget: project.budget || '',
-        actualCost: project.actualCost || '',
-        startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
-        targetDate: project.targetDate ? new Date(project.targetDate).toISOString().split('T')[0] : '',
-        completionDate: project.completionDate ? new Date(project.completionDate).toISOString().split('T')[0] : '',
-        projectManager: project.projectManager || '',
-        technicalLead: project.technicalLead || '',
-        quoteNumber: project.quoteNumber || '',
-        poNumber: project.poNumber || '',
-        invoiceNumber: project.invoiceNumber || '',
-        amountInvoiced: project.amountInvoiced || '',
+        actual_cost: project.actual_cost || '',
+        start_date: project.start_date ? new Date(project.start_date).toISOString().split('T')[0] : '',
+        target_date: project.target_date ? new Date(project.target_date).toISOString().split('T')[0] : '',
+        completion_date: project.completion_date ? new Date(project.completion_date).toISOString().split('T')[0] : '',
+        project_manager: project.project_manager || '',
+        technical_lead: project.technical_lead || '',
+        quote_number: project.quote_number || '',
+        po_number: project.po_number || '',
         notes: project.notes || ''
       });
     }
     setLoading(false);
-  }, [id, projects]);
+  }, [id, projects, project]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,12 +65,16 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
     setSaving(true);
 
     try {
-      // Convert budget and actualCost to numbers
+      // Get customer name from selected customer
+      const selectedCustomer = customers.find(c => c.id === parseInt(formData.customer_id));
+      
+      // Convert budget and actual_cost to numbers
       const updatedData = {
         ...formData,
+        customer_id: parseInt(formData.customer_id),
+        customer_name: selectedCustomer ? selectedCustomer.name : '',
         budget: formData.budget ? parseFloat(formData.budget) : 0,
-        actualCost: formData.actualCost ? parseFloat(formData.actualCost) : 0,
-        amountInvoiced: formData.amountInvoiced ? parseFloat(formData.amountInvoiced) : 0
+        actual_cost: formData.actual_cost ? parseFloat(formData.actual_cost) : 0
       };
 
       await onUpdateProject(id, updatedData);
@@ -99,6 +99,9 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
       </div>
     );
   }
+  if (!project) {
+    return <div className="error-container"><h2>Project not found</h2><button onClick={() => navigate('/')} className="btn btn-primary">Back to Projects</button></div>;
+  }
 
   return (
     <div className="form-container">
@@ -112,15 +115,15 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
           <h2>Basic Information</h2>
           
           <div className="form-group">
-            <label htmlFor="projectName">
+            <label htmlFor="name">
               <FiFolder />
               Project Name *
             </label>
             <input
               type="text"
-              id="projectName"
-              name="projectName"
-              value={formData.projectName}
+              id="name"
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
               required
               placeholder="Enter project name..."
@@ -129,13 +132,13 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="projectDescription">
+            <label htmlFor="description">
               Project Description *
             </label>
             <textarea
-              id="projectDescription"
-              name="projectDescription"
-              value={formData.projectDescription}
+              id="description"
+              name="description"
+              value={formData.description}
               onChange={handleInputChange}
               required
               rows="4"
@@ -146,35 +149,35 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="customer">
+              <label htmlFor="customer_id">
                 <FiUser />
                 Customer *
               </label>
               <select
-                id="customer"
-                name="customer"
-                value={formData.customer}
+                id="customer_id"
+                name="customer_id"
+                value={formData.customer_id}
                 onChange={handleInputChange}
                 required
                 className="form-select"
               >
                 <option value="">Select a customer</option>
                 {customers.map(customer => (
-                  <option key={customer._id} value={customer._id}>
-                    {customer.company || customer.name} {customer.company && customer.name && `(${customer.name})`}
+                  <option key={customer.id} value={customer.id}>
+                    {customer.name}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="projectType">
+              <label htmlFor="type">
                 Project Type
               </label>
               <select
-                id="projectType"
-                name="projectType"
-                value={formData.projectType}
+                id="type"
+                name="type"
+                value={formData.type}
                 onChange={handleInputChange}
                 className="form-select"
               >
@@ -254,15 +257,15 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="actualCost">
+              <label htmlFor="actual_cost">
                 <FiDollarSign />
                 Actual Cost ($)
               </label>
               <input
                 type="number"
-                id="actualCost"
-                name="actualCost"
-                value={formData.actualCost}
+                id="actual_cost"
+                name="actual_cost"
+                value={formData.actual_cost}
                 onChange={handleInputChange}
                 placeholder="0.00"
                 step="0.01"
@@ -272,25 +275,7 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="amountInvoiced">
-                <FiDollarSign />
-                Amount Invoiced ($)
-              </label>
-              <input
-                type="number"
-                id="amountInvoiced"
-                name="amountInvoiced"
-                value={formData.amountInvoiced}
-                onChange={handleInputChange}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-                className="form-input"
-              />
-            </div>
-          </div>
+
         </div>
 
         <div className="form-section">
@@ -298,30 +283,30 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="startDate">
+              <label htmlFor="start_date">
                 <FiCalendar />
                 Start Date
               </label>
               <input
                 type="date"
-                id="startDate"
-                name="startDate"
-                value={formData.startDate}
+                id="start_date"
+                name="start_date"
+                value={formData.start_date}
                 onChange={handleInputChange}
                 className="form-input"
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="targetDate">
+              <label htmlFor="target_date">
                 <FiCalendar />
                 Target Date
               </label>
               <input
                 type="date"
-                id="targetDate"
-                name="targetDate"
-                value={formData.targetDate}
+                id="target_date"
+                name="target_date"
+                value={formData.target_date}
                 onChange={handleInputChange}
                 className="form-input"
               />
@@ -329,15 +314,15 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="completionDate">
+            <label htmlFor="completion_date">
               <FiCalendar />
               Completion Date
             </label>
             <input
               type="date"
-              id="completionDate"
-              name="completionDate"
-              value={formData.completionDate}
+              id="completion_date"
+              name="completion_date"
+              value={formData.completion_date}
               onChange={handleInputChange}
               className="form-input"
             />
@@ -349,15 +334,15 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="projectManager">
+              <label htmlFor="project_manager">
                 <FiUsers />
                 Project Manager
               </label>
               <input
                 type="text"
-                id="projectManager"
-                name="projectManager"
-                value={formData.projectManager}
+                id="project_manager"
+                name="project_manager"
+                value={formData.project_manager}
                 onChange={handleInputChange}
                 placeholder="Project manager name"
                 className="form-input"
@@ -365,15 +350,15 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="technicalLead">
+              <label htmlFor="technical_lead">
                 <FiUsers />
                 Technical Lead
               </label>
               <input
                 type="text"
-                id="technicalLead"
-                name="technicalLead"
-                value={formData.technicalLead}
+                id="technical_lead"
+                name="technical_lead"
+                value={formData.technical_lead}
                 onChange={handleInputChange}
                 placeholder="Technical lead name"
                 className="form-input"
@@ -383,15 +368,15 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="quoteNumber">
+              <label htmlFor="quote_number">
                 <FiHash />
                 Quote Number
               </label>
               <input
                 type="text"
-                id="quoteNumber"
-                name="quoteNumber"
-                value={formData.quoteNumber}
+                id="quote_number"
+                name="quote_number"
+                value={formData.quote_number}
                 onChange={handleInputChange}
                 placeholder="e.g., QU-12345"
                 className="form-input"
@@ -399,15 +384,15 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="poNumber">
+              <label htmlFor="po_number">
                 <FiFileText />
                 PO Number
               </label>
               <input
                 type="text"
-                id="poNumber"
-                name="poNumber"
-                value={formData.poNumber}
+                id="po_number"
+                name="po_number"
+                value={formData.po_number}
                 onChange={handleInputChange}
                 placeholder="e.g., PO-67890"
                 className="form-input"
@@ -415,21 +400,7 @@ const ProjectEditForm = ({ projects, customers, onUpdateProject }) => {
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="invoiceNumber">
-              <FiFileText />
-              Invoice Number
-            </label>
-            <input
-              type="text"
-              id="invoiceNumber"
-              name="invoiceNumber"
-              value={formData.invoiceNumber}
-              onChange={handleInputChange}
-              placeholder="e.g., INV-11111"
-              className="form-input"
-            />
-          </div>
+
         </div>
 
         <div className="form-section">

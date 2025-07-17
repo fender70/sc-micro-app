@@ -9,35 +9,18 @@ const CustomerForm = ({ onSubmit }) => {
     name: '',
     email: '',
     phone: '',
-    company: '',
-    address: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: ''
-    },
+    contact: '',
+    address: '',
     notes: ''
   });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.startsWith('address.')) {
-      const addressField = name.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          [addressField]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -46,7 +29,7 @@ const CustomerForm = ({ onSubmit }) => {
 
     try {
       await onSubmit(formData);
-      navigate('/');
+      navigate('/customers');
     } catch (error) {
       console.error('Error creating customer:', error);
       alert('Error creating customer. Please try again.');
@@ -116,89 +99,33 @@ const CustomerForm = ({ onSubmit }) => {
 
             <div className="form-group">
               <label className="form-label">
-                <FiBriefcase />
-                Company
+                <FiUser />
+                Contact Person
               </label>
               <input
                 type="text"
-                name="company"
-                value={formData.company}
+                name="contact"
+                value={formData.contact}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Enter company name"
+                placeholder="Enter contact person name"
               />
             </div>
           </div>
 
-          <div className="form-section">
-            <h3 className="form-section-title">
+          <div className="form-group">
+            <label className="form-label">
               <FiMapPin />
               Address
-            </h3>
-            
-            <div className="form-group">
-              <label className="form-label">Street Address</label>
-              <input
-                type="text"
-                name="address.street"
-                value={formData.address.street}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="Enter street address"
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">City</label>
-                <input
-                  type="text"
-                  name="address.city"
-                  value={formData.address.city}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="Enter city"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">State/Province</label>
-                <input
-                  type="text"
-                  name="address.state"
-                  value={formData.address.state}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="Enter state"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">ZIP/Postal Code</label>
-                <input
-                  type="text"
-                  name="address.zipCode"
-                  value={formData.address.zipCode}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="Enter ZIP code"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Country</label>
-                <input
-                  type="text"
-                  name="address.country"
-                  value={formData.address.country}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="Enter country"
-                />
-              </div>
-            </div>
+            </label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="Enter full address"
+              rows="3"
+            />
           </div>
 
           <div className="form-group">
@@ -216,7 +143,7 @@ const CustomerForm = ({ onSubmit }) => {
           <div className="form-actions">
             <button
               type="button"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/customers')}
               className="btn btn-outline"
               disabled={loading}
             >

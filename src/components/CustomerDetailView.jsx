@@ -27,14 +27,14 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
   const [activeTab, setActiveTab] = useState('overview');
 
   const customer = useMemo(() => {
-    return customers.find(c => c._id === id);
+    return customers.find(c => c.id === parseInt(id));
   }, [customers, id]);
 
   const customerData = useMemo(() => {
     if (!customer) return null;
 
-    const customerWorkRequests = workRequests.filter(wr => wr.customer?._id === id);
-    const customerProjects = projects.filter(p => p.customer?._id === id);
+      const customerWorkRequests = workRequests.filter(wr => wr.customer_id === parseInt(id));
+  const customerProjects = projects.filter(p => p.customer_id === parseInt(id));
 
     // Calculate metrics
     const totalWorkRequests = customerWorkRequests.length;
@@ -57,11 +57,11 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
     ).length;
 
     const invoicedWorkRequests = customerWorkRequests.filter(wr => 
-      wr.invoiceNumber && wr.invoiceNumber.trim() !== ''
+      wr.notes && wr.notes.trim() !== ''
     ).length;
 
     const totalRevenue = customerProjects.reduce((sum, p) => 
-      sum + (p.amountInvoiced || 0), 0
+      sum + (p.actual_cost || 0), 0
     );
 
     // Calculate completion rate
@@ -71,10 +71,10 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
 
     // Calculate average project time
     const projectTimes = customerWorkRequests
-      .filter(wr => wr.shipDate && wr.createdAt)
+      .filter(wr => wr.target_date && wr.created_at)
       .map(wr => {
-        const startDate = new Date(wr.createdAt);
-        const endDate = new Date(wr.shipDate);
+        const startDate = new Date(wr.created_at);
+        const endDate = new Date(wr.target_date);
         return (endDate - startDate) / (1000 * 60 * 60 * 24); // days
       });
 
@@ -85,7 +85,7 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
     // Get project types
     const projectTypes = {};
     customerWorkRequests.forEach(wr => {
-      const type = wr.workRequestDetails.toLowerCase();
+      const type = (wr.description || '').toLowerCase();
       if (type.includes('wirebond')) projectTypes.wirebond = (projectTypes.wirebond || 0) + 1;
       else if (type.includes('die attach') || type.includes('die-attach')) projectTypes['die-attach'] = (projectTypes['die-attach'] || 0) + 1;
       else if (type.includes('flip chip') || type.includes('flip-chip')) projectTypes['flip-chip'] = (projectTypes['flip-chip'] || 0) + 1;
@@ -100,13 +100,13 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
       ...customerWorkRequests.map(wr => ({
         type: 'work-request',
         item: wr,
-        date: new Date(wr.updatedAt),
+        date: new Date(wr.updated_at),
         action: 'updated'
       })),
       ...customerProjects.map(p => ({
         type: 'project',
         item: p,
-        date: new Date(p.updatedAt),
+        date: new Date(p.updated_at),
         action: 'updated'
       }))
     ].sort((a, b) => b.date - a.date).slice(0, 10);
@@ -133,9 +133,7 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
   }, [customer, workRequests, projects, id]);
 
   useEffect(() => {
-    if (customer) {
-      setLoading(false);
-    }
+    setLoading(false);
   }, [customer]);
 
   const getStatusColor = (status) => {
@@ -214,7 +212,7 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
             </div>
           </div>
           <div className="header-actions">
-            <Link to={`/edit-customer/${customer._id}`} className="btn btn-primary">
+            <Link to={`/edit-customer/${customer.id}`} className="btn btn-primary">
               <FiEdit />
               Edit Customer
             </Link>
@@ -420,12 +418,12 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
             {customerData.workRequests.length > 0 ? (
               <div className="work-requests-list">
                 {customerData.workRequests.map(request => (
-                  <div key={request._id} className="work-request-item">
+                  <div key={request.id} className="work-request-item">
                     <div className="work-request-header">
                       <div className="work-request-title">
-                        {request.workRequestDetails.length > 60 
-                          ? `${request.workRequestDetails.substring(0, 60)}...`
-                          : request.workRequestDetails
+                        {request.description && request.description.length > 60 
+                          ? `${request.description.substring(0, 60)}...`
+                          : request.description || 'No description'
                         }
                       </div>
                       <div className="work-request-status">
@@ -440,23 +438,23 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
                     <div className="work-request-meta">
                       <div className="meta-item">
                         <FiHash />
-                        <span>{request.quoteNumber || 'No Quote'}</span>
+                        <span>{request.quote_number || 'No Quote'}</span>
                       </div>
                       <div className="meta-item">
                         <FiFileText />
-                        <span>{request.poNumber || 'No PO'}</span>
+                        <span>{request.po_number || 'No PO'}</span>
                       </div>
                       <div className="meta-item">
                         <FiFileText />
-                        <span>{request.invoiceNumber || 'No Invoice'}</span>
+                        <span>{request.notes || 'No Notes'}</span>
                       </div>
                       <div className="meta-item">
                         <FiCalendar />
-                        <span>{formatDate(request.shipDate)}</span>
+                        <span>{formatDate(request.target_date)}</span>
                       </div>
                     </div>
                     <div className="work-request-actions">
-                      <Link to={`/edit-work-request/${request._id}`} className="btn btn-outline btn-sm">
+                      <Link to={`/edit-work-request/${request.id}`} className="btn btn-outline btn-sm">
                         <FiEdit />
                         Edit
                       </Link>
@@ -486,11 +484,11 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
             {customerData.projects.length > 0 ? (
               <div className="projects-list">
                 {customerData.projects.map(project => (
-                  <div key={project._id} className="project-item">
+                  <div key={project.id} className="project-item">
                     <div className="project-header">
                       <div className="project-title">
-                        <h4>{project.projectName}</h4>
-                        <div className="project-type">{project.projectType}</div>
+                        <h4>{project.name}</h4>
+                        <div className="project-type">{project.type}</div>
                       </div>
                       <div className="project-status">
                         <span 
@@ -502,7 +500,7 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
                       </div>
                     </div>
                     <div className="project-description">
-                      {project.projectDescription}
+                                              {project.description}
                     </div>
                     <div className="project-meta">
                       <div className="meta-item">
@@ -511,15 +509,15 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
                       </div>
                       <div className="meta-item">
                         <FiCalendar />
-                        <span>{formatDate(project.targetDate)}</span>
+                        <span>{formatDate(project.target_date)}</span>
                       </div>
                       <div className="meta-item">
                         <FiHash />
-                        <span>{project.quoteNumber || 'No Quote'}</span>
+                        <span>{project.quote_number || 'No Quote'}</span>
                       </div>
                     </div>
                     <div className="project-actions">
-                      <Link to={`/edit-project/${project._id}`} className="btn btn-outline btn-sm">
+                      <Link to={`/edit-project/${project.id}`} className="btn btn-outline btn-sm">
                         <FiEdit />
                         Edit
                       </Link>
@@ -554,8 +552,8 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
                       </div>
                       <div className="activity-description">
                         {activity.type === 'work-request' 
-                          ? activity.item.workRequestDetails.substring(0, 50) + '...'
-                          : activity.item.projectName
+                          ? (activity.item.description ? activity.item.description.substring(0, 50) + '...' : 'No description')
+                          : activity.item.name
                         }
                       </div>
                       <div className="activity-date">

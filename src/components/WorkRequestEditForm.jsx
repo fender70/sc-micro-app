@@ -9,27 +9,25 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    customer: '',
-    workRequestDetails: '',
-    quoteNumber: '',
-    poNumber: '',
-    invoiceNumber: '',
-    scMicroReport: '',
-    shipDate: '',
+    customer_id: '',
+    description: '',
+    quote_number: '',
+    po_number: '',
+    notes: '',
+    target_date: '',
     status: 'pending'
   });
 
+  const workRequest = workRequests.find(wr => wr.id === parseInt(id));
   useEffect(() => {
-    const workRequest = workRequests.find(wr => wr._id === id);
     if (workRequest) {
       setFormData({
-        customer: workRequest.customer?._id || '',
-        workRequestDetails: workRequest.workRequestDetails || '',
-        quoteNumber: workRequest.quoteNumber || '',
-        poNumber: workRequest.poNumber || '',
-        invoiceNumber: workRequest.invoiceNumber || '',
-        scMicroReport: workRequest.scMicroReport || '',
-        shipDate: workRequest.shipDate ? new Date(workRequest.shipDate).toISOString().split('T')[0] : '',
+        customer_id: workRequest.customer_id || '',
+        description: workRequest.description || '',
+        quote_number: workRequest.quote_number || '',
+        po_number: workRequest.po_number || '',
+        notes: workRequest.notes || '',
+        target_date: workRequest.target_date ? new Date(workRequest.target_date).toISOString().split('T')[0] : '',
         status: workRequest.status || 'pending'
       });
     }
@@ -49,7 +47,17 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
     setSaving(true);
 
     try {
-      await onUpdateWorkRequest(id, formData);
+      // Get customer name from selected customer
+      const selectedCustomer = customers.find(c => c.id === parseInt(formData.customer_id));
+      
+      const updatedData = {
+        ...formData,
+        customer_id: parseInt(formData.customer_id),
+        customer_name: selectedCustomer ? selectedCustomer.name : '',
+        project_type: 'general' // Default project type since it's required
+      };
+
+      await onUpdateWorkRequest(id, updatedData);
       navigate('/');
     } catch (error) {
       console.error('Error updating work request:', error);
@@ -71,6 +79,9 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
       </div>
     );
   }
+  if (!workRequest) {
+    return <div className="error-container"><h2>Work Request not found</h2><button onClick={() => navigate('/')} className="btn btn-primary">Back to Work Orders</button></div>;
+  }
 
   return (
     <div className="form-container">
@@ -84,36 +95,36 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
           <h2>Basic Information</h2>
           
           <div className="form-group">
-            <label htmlFor="customer">
+            <label htmlFor="customer_id">
               <FiUser />
               Customer *
             </label>
             <select
-              id="customer"
-              name="customer"
-              value={formData.customer}
+              id="customer_id"
+              name="customer_id"
+              value={formData.customer_id}
               onChange={handleInputChange}
               required
               className="form-select"
             >
               <option value="">Select a customer</option>
               {customers.map(customer => (
-                <option key={customer._id} value={customer._id}>
-                  {customer.company || customer.name} {customer.company && customer.name && `(${customer.name})`}
+                <option key={customer.id} value={customer.id}>
+                  {customer.name}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="form-group">
-            <label htmlFor="workRequestDetails">
+            <label htmlFor="description">
               <FiClipboard />
               Work Request Details *
             </label>
             <textarea
-              id="workRequestDetails"
-              name="workRequestDetails"
-              value={formData.workRequestDetails}
+              id="description"
+              name="description"
+              value={formData.description}
               onChange={handleInputChange}
               required
               rows="4"
@@ -150,15 +161,15 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="quoteNumber">
+              <label htmlFor="quote_number">
                 <FiHash />
                 Quote Number
               </label>
               <input
                 type="text"
-                id="quoteNumber"
-                name="quoteNumber"
-                value={formData.quoteNumber}
+                id="quote_number"
+                name="quote_number"
+                value={formData.quote_number}
                 onChange={handleInputChange}
                 placeholder="e.g., QU-12345"
                 className="form-input"
@@ -166,15 +177,15 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
             </div>
 
             <div className="form-group">
-              <label htmlFor="poNumber">
+              <label htmlFor="po_number">
                 <FiFileText />
                 PO Number
               </label>
               <input
                 type="text"
-                id="poNumber"
-                name="poNumber"
-                value={formData.poNumber}
+                id="po_number"
+                name="po_number"
+                value={formData.po_number}
                 onChange={handleInputChange}
                 placeholder="e.g., PO-67890"
                 className="form-input"
@@ -184,31 +195,31 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="invoiceNumber">
+              <label htmlFor="notes">
                 <FiFileText />
-                Invoice Number
+                Notes
               </label>
               <input
                 type="text"
-                id="invoiceNumber"
-                name="invoiceNumber"
-                value={formData.invoiceNumber}
+                id="notes"
+                name="notes"
+                value={formData.notes}
                 onChange={handleInputChange}
-                placeholder="e.g., INV-11111"
+                placeholder="Additional notes..."
                 className="form-input"
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="shipDate">
+              <label htmlFor="target_date">
                 <FiCalendar />
-                Ship Date
+                Target Date
               </label>
               <input
                 type="date"
-                id="shipDate"
-                name="shipDate"
-                value={formData.shipDate}
+                id="target_date"
+                name="target_date"
+                value={formData.target_date}
                 onChange={handleInputChange}
                 className="form-input"
               />
@@ -219,20 +230,7 @@ const WorkRequestEditForm = ({ workRequests, customers, onUpdateWorkRequest }) =
         <div className="form-section">
           <h2>Additional Information</h2>
           
-          <div className="form-group">
-            <label htmlFor="scMicroReport">
-              SC Micro Report URL
-            </label>
-            <input
-              type="url"
-              id="scMicroReport"
-              name="scMicroReport"
-              value={formData.scMicroReport}
-              onChange={handleInputChange}
-              placeholder="https://example.com/report.pdf"
-              className="form-input"
-            />
-          </div>
+
         </div>
 
         <div className="form-actions">

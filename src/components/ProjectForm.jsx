@@ -4,39 +4,27 @@ import { FiSave, FiX, FiCalendar, FiDollarSign, FiUser, FiFileText } from 'react
 import axios from 'axios';
 import './ProjectForm.css';
 
-const ProjectForm = ({ onSubmit }) => {
+const ProjectForm = ({ customers, onSubmit }) => {
   const navigate = useNavigate();
-  const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    customer: '',
-    projectName: '',
-    projectDescription: '',
-    projectType: 'other',
+    customer_id: '',
+    name: '',
+    description: '',
+    type: 'other',
     status: 'planning',
     priority: 'medium',
-    startDate: '',
-    targetDate: '',
+    start_date: '',
+    target_date: '',
     budget: '',
-    quoteNumber: '',
-    poNumber: '',
-    projectManager: '',
-    technicalLead: '',
+    quote_number: '',
+    po_number: '',
+    project_manager: '',
+    technical_lead: '',
     notes: ''
   });
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
 
-  const fetchCustomers = async () => {
-    try {
-      const response = await axios.get('/api/customers');
-      setCustomers(response.data);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,8 +39,13 @@ const ProjectForm = ({ onSubmit }) => {
     setLoading(true);
 
     try {
+      // Get customer name from selected customer
+      const selectedCustomer = customers.find(c => c.id === parseInt(formData.customer_id));
+      
       const projectData = {
         ...formData,
+        customer_id: parseInt(formData.customer_id),
+        customer_name: selectedCustomer ? selectedCustomer.name : '',
         budget: formData.budget ? parseFloat(formData.budget) : 0
       };
 
@@ -87,35 +80,35 @@ const ProjectForm = ({ onSubmit }) => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="customer" className="form-label">
+              <label htmlFor="customer_id" className="form-label">
                 Customer *
               </label>
               <select
-                id="customer"
-                name="customer"
-                value={formData.customer}
+                id="customer_id"
+                name="customer_id"
+                value={formData.customer_id}
                 onChange={handleChange}
                 className="form-select"
                 required
               >
                 <option value="">Select a customer</option>
                 {customers.map(customer => (
-                  <option key={customer._id} value={customer._id}>
-                    {customer.company || customer.name}
+                  <option key={customer.id} value={customer.id}>
+                    {customer.name}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="projectName" className="form-label">
+              <label htmlFor="name" className="form-label">
                 Project Name *
               </label>
               <input
                 type="text"
-                id="projectName"
-                name="projectName"
-                value={formData.projectName}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 className="form-input"
                 placeholder="Enter project name"
@@ -125,13 +118,13 @@ const ProjectForm = ({ onSubmit }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="projectDescription" className="form-label">
+            <label htmlFor="description" className="form-label">
               Project Description
             </label>
             <textarea
-              id="projectDescription"
-              name="projectDescription"
-              value={formData.projectDescription}
+              id="description"
+              name="description"
+              value={formData.description}
               onChange={handleChange}
               className="form-textarea"
               placeholder="Describe the project details, requirements, and objectives"
@@ -141,13 +134,13 @@ const ProjectForm = ({ onSubmit }) => {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="projectType" className="form-label">
+              <label htmlFor="type" className="form-label">
                 Project Type
               </label>
               <select
-                id="projectType"
-                name="projectType"
-                value={formData.projectType}
+                id="type"
+                name="type"
+                value={formData.type}
                 onChange={handleChange}
                 className="form-select"
               >
@@ -208,28 +201,28 @@ const ProjectForm = ({ onSubmit }) => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="startDate" className="form-label">
+              <label htmlFor="start_date" className="form-label">
                 Start Date
               </label>
               <input
                 type="date"
-                id="startDate"
-                name="startDate"
-                value={formData.startDate}
+                id="start_date"
+                name="start_date"
+                value={formData.start_date}
                 onChange={handleChange}
                 className="form-input"
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="targetDate" className="form-label">
+              <label htmlFor="target_date" className="form-label">
                 Target Date
               </label>
               <input
                 type="date"
-                id="targetDate"
-                name="targetDate"
-                value={formData.targetDate}
+                id="target_date"
+                name="target_date"
+                value={formData.target_date}
                 onChange={handleChange}
                 className="form-input"
               />
@@ -262,14 +255,14 @@ const ProjectForm = ({ onSubmit }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="quoteNumber" className="form-label">
+              <label htmlFor="quote_number" className="form-label">
                 Quote Number
               </label>
               <input
                 type="text"
-                id="quoteNumber"
-                name="quoteNumber"
-                value={formData.quoteNumber}
+                id="quote_number"
+                name="quote_number"
+                value={formData.quote_number}
                 onChange={handleChange}
                 className="form-input"
                 placeholder="e.g., Q-2024-001"
@@ -277,14 +270,14 @@ const ProjectForm = ({ onSubmit }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="poNumber" className="form-label">
+              <label htmlFor="po_number" className="form-label">
                 PO Number
               </label>
               <input
                 type="text"
-                id="poNumber"
-                name="poNumber"
-                value={formData.poNumber}
+                id="po_number"
+                name="po_number"
+                value={formData.po_number}
                 onChange={handleChange}
                 className="form-input"
                 placeholder="e.g., PO-2024-001"
@@ -301,14 +294,14 @@ const ProjectForm = ({ onSubmit }) => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="projectManager" className="form-label">
+              <label htmlFor="project_manager" className="form-label">
                 Project Manager
               </label>
               <input
                 type="text"
-                id="projectManager"
-                name="projectManager"
-                value={formData.projectManager}
+                id="project_manager"
+                name="project_manager"
+                value={formData.project_manager}
                 onChange={handleChange}
                 className="form-input"
                 placeholder="Enter project manager name"
@@ -316,14 +309,14 @@ const ProjectForm = ({ onSubmit }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="technicalLead" className="form-label">
+              <label htmlFor="technical_lead" className="form-label">
                 Technical Lead
               </label>
               <input
                 type="text"
-                id="technicalLead"
-                name="technicalLead"
-                value={formData.technicalLead}
+                id="technical_lead"
+                name="technical_lead"
+                value={formData.technical_lead}
                 onChange={handleChange}
                 className="form-input"
                 placeholder="Enter technical lead name"

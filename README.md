@@ -1,171 +1,234 @@
 # SC Micro Enterprise Management System
 
-A full-stack MERN application for managing work requests, customer relationships, and project tracking in a manufacturing environment. **This is a demo version with in-memory data storage.**
+A modern, full-stack enterprise management application built with React, Node.js, SQLite, and AI integration. This project demonstrates advanced web development skills, database design, and intelligent system automation.
+
+![SC Micro Dashboard](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+![React](https://img.shields.io/badge/React-18.0-blue)
+![Node.js](https://img.shields.io/badge/Node.js-18.0-green)
+![SQLite](https://img.shields.io/badge/SQLite-3.0-orange)
+![Python](https://img.shields.io/badge/Python-3.8+-yellow)
 
 ## 🚀 Live Demo
 
-[Add your deployed demo link here]
+[View Live Demo](https://sc-micro-demo.vercel.app)
 
-## ✨ Features
+## 📋 Project Overview
 
-### Dashboard & Analytics
-- **Real-time Dashboard**: Comprehensive overview with status breakdowns and key metrics
-- **Customer Analytics**: Customer tiering system (Premium, Gold, Silver, Bronze) based on project value and completion rates
-- **Project Tracking**: Visual project type analysis (wirebond, die attach, flip chip, encapsulation)
-- **Performance Metrics**: Completion rates, average project time, and revenue tracking
+SC Micro is a comprehensive enterprise management system designed for semiconductor manufacturing companies. It provides real-time tracking of work requests, customer relationships, and project analytics with an intelligent AI assistant for enhanced user experience.
 
-### Work Request Management
-- **Complete CRUD Operations**: Create, read, update, and delete work requests
-- **Status Workflow**: Track requests from pending → in-progress → completed → shipped
-- **Advanced Filtering**: Search by customer, status, date range, and project details
-- **Bulk Operations**: CSV import/export for efficient data management
+### Key Features
 
-### Customer Relationship Management
-- **Customer Profiles**: Comprehensive contact and address management
-- **Project History**: View all projects and work requests per customer
-- **Business Intelligence**: Customer value scoring and relationship analytics
-- **Contact Management**: Store multiple contacts per customer with detailed notes
+- **📊 Real-time Dashboard** - Live metrics and KPI tracking
+- **👥 Customer Management** - Complete CRM with relationship analytics
+- **🔧 Work Request System** - End-to-end request lifecycle management
+- **📈 Project Analytics** - Advanced project tracking and reporting
+- **🤖 AI Assistant** - Intelligent chat interface for system queries
+- **📁 CSV Operations** - Bulk data import/export functionality
+- **📱 Responsive Design** - Mobile-first, modern UI/UX
 
-### Data Management
-- **CSV Import/Export**: Support for real-world work order tracker formats
-- **Smart Status Mapping**: Automatic conversion of business statuses to system statuses
-- **Multi-line Support**: Handle complex project notes and descriptions
-- **Template Downloads**: Pre-formatted CSV templates for data entry
-
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
 ### Frontend
-- **React 18** with modern hooks and functional components
-- **React Router** for client-side navigation
-- **CSS3** with custom properties and responsive design
-- **React Icons** for consistent UI elements
-- **Axios** for API communication
+- **React 18** - Modern UI framework with hooks
+- **Vite** - Fast build tool and development server
+- **CSS3** - Custom styling with modern design patterns
+- **React Router** - Client-side routing
 
 ### Backend
-- **Node.js** with Express.js framework
-- **In-memory data storage** for demo purposes
-- **Mock CSV handling** for file upload simulation
-- **CORS** enabled for cross-origin requests
+- **Node.js** - Server-side JavaScript runtime
+- **Express.js** - Web application framework
+- **SQLite** - Lightweight, embedded database
+- **RESTful APIs** - Clean, scalable API design
+
+### AI Integration
+- **Python LangGraph** - Advanced AI agent framework
+- **OpenAI GPT-4** - Natural language processing
+- **Real-time Chat** - WebSocket-based communication
 
 ### Development Tools
-- **Concurrently** for running frontend and backend simultaneously
-- **Nodemon** for development server auto-restart
-- **Environment variables** for configuration management
+- **ESLint** - Code quality and consistency
+- **Git** - Version control
+- **npm** - Package management
 
-## 📦 Installation
+## 🏗️ Architecture
+
+```
+sc-micro-app/
+├── src/                    # React frontend
+│   ├── components/         # Reusable UI components
+│   ├── contexts/          # React context providers
+│   └── assets/            # Static assets
+├── api/                   # Express.js backend
+│   ├── database.js        # Database operations
+│   ├── assistant.js       # AI chat integration
+│   └── csv-upload.js      # File upload handling
+├── database/              # Database layer
+│   ├── db.js             # Database manager
+│   └── schema.sql        # Database schema
+└── langgraph_agent.py    # AI agent implementation
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- Python 3.8+
+- npm or yarn
+
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/fender70/sc-micro-app]
+   git clone https://github.com/fender70/sc-micro-app.git
    cd sc-micro-app
    ```
 
 2. **Install dependencies**
    ```bash
-   # Install backend dependencies
    npm install
-   
-   # Install frontend dependencies
-   cd client && npm install && cd ..
    ```
 
-3. **Set up environment variables (optional for demo)**
+3. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # No database setup required for demo version
+   # Add your OpenAI API key to .env
    ```
 
-4. **Start the development servers**
+4. **Initialize the database**
    ```bash
+   npm run setup-db
+   ```
+
+5. **Start development servers**
+   ```bash
+   # Terminal 1: Frontend
    npm run dev
+   
+   # Terminal 2: Backend
+   npm run backend
+   
+   # Terminal 3: AI Agent (optional)
+   python3 langgraph_agent.py
    ```
 
-5. **Seed the database (not needed for demo)**
-   ```bash
-   # Demo version comes with pre-loaded sample data
+6. **Open your browser**
+   ```
+   Frontend: http://localhost:5173
+   Backend: http://localhost:3001
    ```
 
-## 🏗️ Project Structure
+## 📖 Usage Guide
 
-```
-sc-micro-app/
-├── client/                 # React frontend
-│   ├── public/            # Static assets
-│   └── src/
-│       ├── components/    # Reusable UI components
-│       ├── contexts/      # React contexts (theme, etc.)
-│       └── assets/        # Images and static files
-├── models/                # Mongoose data models
-├── routes/                # Express API routes
-├── uploads/               # File upload directory
-├── server.js             # Express server entry point
-├── seed-data.js          # Database seeding script
-└── package.json          # Backend dependencies
-```
+### Dashboard
+- View real-time system metrics
+- Monitor pending work requests
+- Track customer engagement
 
-## 🔧 API Endpoints
+### Customer Management
+- Add and edit customer profiles
+- View customer tier analytics
+- Track project history
 
 ### Work Requests
-- `GET /api/workrequests` - Get all work requests
-- `POST /api/workrequests` - Create new work request
-- `PUT /api/workrequests/:id` - Update work request
-- `DELETE /api/workrequests/:id` - Delete work request
+- Create new work requests
+- Update request status
+- Track completion rates
 
-### Customers
-- `GET /api/customers` - Get all customers
-- `POST /api/customers` - Create new customer
-- `PUT /api/customers/:id` - Update customer
-- `DELETE /api/customers/:id` - Delete customer
+### AI Assistant
+- Ask questions about your data
+- Get insights and recommendations
+- Navigate the system naturally
 
-### Projects
-- `GET /api/projects` - Get all projects
-- `POST /api/projects` - Create new project
-- `PUT /api/projects/:id` - Update project
-- `DELETE /api/projects/:id` - Delete project
+## 🔧 API Documentation
 
-### CSV Operations
-- `POST /api/csv/upload` - Upload CSV file
-- `GET /api/csv/template` - Download CSV template
+### Core Endpoints
 
-## 🎨 Key Features Implementation
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/customers` | GET | Retrieve all customers |
+| `/api/customers` | POST | Create new customer |
+| `/api/workrequests` | GET | Get all work requests |
+| `/api/projects` | GET | Retrieve all projects |
+| `/api/assistant/chat` | POST | AI assistant chat |
 
-### Responsive Design
-- Mobile-first approach with CSS Grid and Flexbox
-- Adaptive layouts for desktop, tablet, and mobile
-- Touch-friendly interface elements
+### Example API Call
 
-### Real-time Updates
-- Immediate UI updates without page refreshes
-- Optimized with React hooks and memoization
-- Efficient state management
+```javascript
+// Get all customers
+const response = await fetch('/api/customers');
+const customers = await response.json();
 
-### Data Visualization
-- Color-coded status indicators
-- Progress bars and charts
-- Customer tiering visualizations
+// Chat with AI assistant
+const chatResponse = await fetch('/api/assistant/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    message: "Show me the dashboard overview",
+    current_page: "/",
+    user_role: "operator"
+  })
+});
+```
 
-## 🚀 Deployment
+## 🎯 Key Achievements
 
-### Demo Deployment
-1. Deploy to Vercel: `vercel --prod`
-2. No database setup required
-3. Application works immediately with sample data
+- **Scalable Architecture** - Modular design supporting enterprise growth
+- **Real-time Data** - Live updates across all system components
+- **AI Integration** - Intelligent assistant for enhanced user experience
+- **Database Design** - Optimized schema for performance and scalability
+- **Modern UI/UX** - Responsive design with intuitive navigation
+- **Error Handling** - Comprehensive error management and user feedback
 
-### Production Deployment
-1. Set up MongoDB Atlas or production MongoDB instance
-2. Deploy to Heroku, Railway, or similar platform
-3. Configure environment variables
-4. Build the React app: `npm run build`
-5. Deploy frontend to Vercel, Netlify, or similar platform
+## 🧪 Testing
 
-## 📝 License
+```bash
+# Run frontend tests
+npm run test
 
-This project is licensed under the MIT License.
+# Run backend tests
+npm run test:backend
+
+# Run full test suite
+npm run test:all
+```
+
+## 📦 Deployment
+
+### Production Build
+```bash
+npm run build
+npm run start
+```
+
+### Environment Variables
+```bash
+NODE_ENV=production
+PORT=3001
+OPENAI_API_KEY=your_api_key
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Author
 
-[Cedric Zarate] - [cedzarate.com]
+**Cedric Zarate**
+- GitHub: [@fender70](https://github.com/fender70)
+- LinkedIn: [LinkedIn](https://www.linkedin.com/in/cedric-zarate-17b735226/)
+- Portfolio: [Portfolio](https://cedzarate.com)
 
----
+## 🙏 Acknowledgments
 
-**Note**: This is a demonstration project showcasing full-stack development skills with the MERN stack, focusing on enterprise-level features and real-world business requirements. # Force new deployment
+- OpenAI for GPT-4 integration
+- LangGraph team for the AI agent framework
+- React and Node.js communities for excellent documentation

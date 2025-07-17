@@ -10,7 +10,7 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
 
   const handleStatusSave = async () => {
     try {
-      await onStatusUpdate(workRequest._id, { status: editedStatus });
+      await onStatusUpdate(workRequest.id, { status: editedStatus });
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating status:', error);
@@ -41,10 +41,10 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
       <div className="work-request-header">
         <div className="work-request-info">
           <div className="work-request-title">
-            {workRequest.customer?.company || workRequest.customer?.name || 'Unknown Company'}
+            {workRequest.customer_name || 'Unknown Company'}
           </div>
           <div className="work-request-customer">
-            {workRequest.customer?.name}
+            {workRequest.customer_name}
           </div>
         </div>
         <div className="work-request-status">
@@ -85,7 +85,7 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
 
       <div className="work-request-body">
         <div className="work-request-details">
-          {workRequest.workRequestDetails}
+          {workRequest.description}
         </div>
 
         <div className="work-request-meta">
@@ -153,18 +153,18 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
       <div className="work-request-actions">
         <div className="action-buttons">
           <Link 
-            to={`/edit-work-request/${workRequest._id}`}
+            to={`/edit-work-request/${workRequest.id}`}
             className="btn btn-outline btn-sm"
             title="Edit work request"
           >
             <FiEdit />
             Edit
           </Link>
-          <button 
-            onClick={() => onDelete(workRequest._id)}
-            className="btn-delete"
-            title="Delete work request"
-          >
+                        <button 
+                onClick={() => onDelete(workRequest.id)}
+                className="btn-delete"
+                title="Delete work request"
+              >
             <FiTrash2 />
             Delete
           </button>

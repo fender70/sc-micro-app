@@ -26,30 +26,30 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
   // Calculate customer metrics and analytics
   const customerAnalytics = useMemo(() => {
     const analytics = customers.map(customer => {
-      const customerProjects = workRequests.filter(wr => wr.customer?._id === customer._id);
+      const customerProjects = workRequests.filter(wr => wr.customer_id === customer.id);
       
       const totalProjects = customerProjects.length;
       const completedProjects = customerProjects.filter(p => ['completed', 'shipped'].includes(p.status)).length;
       const activeProjects = customerProjects.filter(p => ['pending', 'in-progress', 'quoted', 'po-received'].includes(p.status)).length;
       const cancelledProjects = customerProjects.filter(p => p.status === 'cancelled').length;
       
-      const invoicedProjects = customerProjects.filter(p => p.invoiceNumber && p.invoiceNumber.trim() !== '').length;
+      const invoicedProjects = customerProjects.filter(p => p.invoice_number && p.invoice_number.trim() !== '').length;
       const totalRevenue = invoicedProjects; // Count of invoiced projects as proxy for revenue
       
       const avgProjectTime = customerProjects
-        .filter(p => p.shipDate && p.createdAt)
+        .filter(p => p.target_date && p.created_date)
         .reduce((acc, p) => {
-          const startDate = new Date(p.createdAt);
-          const endDate = new Date(p.shipDate);
+          const startDate = new Date(p.created_date);
+          const endDate = new Date(p.target_date);
           return acc + (endDate - startDate) / (1000 * 60 * 60 * 24); // days
         }, 0) / Math.max(completedProjects, 1);
 
       const lastActivity = customerProjects.length > 0 
-        ? new Date(Math.max(...customerProjects.map(p => new Date(p.updatedAt))))
-        : customer.updatedAt;
+        ? new Date(Math.max(...customerProjects.map(p => new Date(p.updated_at || p.created_date))))
+        : new Date();
 
       const projectTypes = customerProjects.reduce((acc, p) => {
-        const details = p.workRequestDetails.toLowerCase();
+        const details = (p.description || '').toLowerCase();
         if (details.includes('wirebond') || details.includes('wire bond')) acc.wirebond++;
         if (details.includes('die attach') || details.includes('dieattach')) acc.dieAttach++;
         if (details.includes('flip chip') || details.includes('flipchip')) acc.flipChip++;
@@ -95,8 +95,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
     return customerAnalytics.filter(customer => {
       const matchesSearch = searchTerm === '' || 
         customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+        (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase()));
       
       const matchesStatus = filterStatus === 'all' || 
         (filterStatus === 'active' && customer.activeProjects > 0) ||
@@ -112,7 +111,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
     const totalCustomers = customers.length;
     const activeCustomers = customerAnalytics.filter(c => c.activeProjects > 0).length;
     const totalProjects = workRequests.length;
-    const totalRevenue = workRequests.filter(wr => wr.invoiceNumber && wr.invoiceNumber.trim() !== '').length;
+    const totalRevenue = workRequests.filter(wr => wr.invoice_number && wr.invoice_number.trim() !== '').length;
     const avgProjectsPerCustomer = totalCustomers > 0 ? Math.round(totalProjects / totalCustomers * 10) / 10 : 0;
 
     return {
@@ -137,11 +136,11 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
     const tier = getCustomerTier(customer.customerValue);
     
     return (
-      <div key={customer._id} className="customer-card">
+              <div key={customer.id} className="customer-card">
         <div className="customer-header">
           <div className="customer-info">
-            <h3 className="customer-name">{customer.company || customer.name}</h3>
-            <div className="customer-contact">{customer.name}</div>
+            <h3 className="customer-name">{customer.name}</h3>
+            <div className="customer-contact">{customer.contact}</div>
             <div className="customer-tier" style={{ color: tier.color }}>
               {tier.tier} Customer
             </div>
@@ -150,14 +149,14 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
             <button 
               className="btn-icon" 
               title="View Details"
-              onClick={() => navigate(`/customer/${customer._id}`)}
+              onClick={() => navigate(`/customer/${customer.id}`)}
             >
               <FiEye />
             </button>
             <button 
               className="btn-icon" 
               title="Edit Customer"
-              onClick={() => navigate(`/edit-customer/${customer._id}`)}
+              onClick={() => navigate(`/edit-customer/${customer.id}`)}
             >
               <FiEdit />
             </button>
@@ -196,10 +195,10 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
               <span>{customer.phone}</span>
             </div>
           )}
-          {customer.address.city && (
+          {customer.address && (
             <div className="detail-item">
               <FiMapPin className="detail-icon" />
-              <span>{customer.address.city}, {customer.address.state}</span>
+              <span>{customer.address}</span>
             </div>
           )}
         </div>

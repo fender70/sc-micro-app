@@ -11,45 +11,52 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid'); // grid, list, timeline
 
+  // Check if data is still loading
+  const isLoading = !Array.isArray(workRequests) || !Array.isArray(customers) || !Array.isArray(projects);
+
   // Enhanced stats with project tracking
   const stats = useMemo(() => {
-    const totalWorkRequests = workRequests.length;
-    const totalProjects = projects.length;
+    // Ensure workRequests and projects are arrays
+    const workRequestsArray = Array.isArray(workRequests) ? workRequests : [];
+    const projectsArray = Array.isArray(projects) ? projects : [];
+    
+    const totalWorkRequests = workRequestsArray.length;
+    const totalProjects = projectsArray.length;
     
     // Work request status counts
-    const pending = workRequests.filter(r => r.status === 'pending').length;
-    const inProgress = workRequests.filter(r => r.status === 'in-progress').length;
-    const completed = workRequests.filter(r => r.status === 'completed').length;
-    const shipped = workRequests.filter(r => r.status === 'shipped').length;
-    const quoted = workRequests.filter(r => r.status === 'quoted').length;
-    const poReceived = workRequests.filter(r => r.status === 'po-received').length;
-    const payment = workRequests.filter(r => r.status === 'payment').length;
-    const cancelled = workRequests.filter(r => r.status === 'cancelled').length;
+    const pending = workRequestsArray.filter(r => r.status === 'pending').length;
+    const inProgress = workRequestsArray.filter(r => r.status === 'in-progress').length;
+    const completed = workRequestsArray.filter(r => r.status === 'completed').length;
+    const shipped = workRequestsArray.filter(r => r.status === 'shipped').length;
+    const quoted = workRequestsArray.filter(r => r.status === 'quoted').length;
+    const poReceived = workRequestsArray.filter(r => r.status === 'po-received').length;
+    const payment = workRequestsArray.filter(r => r.status === 'payment').length;
+    const cancelled = workRequestsArray.filter(r => r.status === 'cancelled').length;
 
     // Project status counts
-    const planningProjects = projects.filter(p => p.status === 'planning').length;
-    const activeProjects = projects.filter(p => p.status === 'active').length;
-    const onHoldProjects = projects.filter(p => p.status === 'on-hold').length;
-    const completedProjects = projects.filter(p => p.status === 'completed').length;
-    const cancelledProjects = projects.filter(p => p.status === 'cancelled').length;
+    const planningProjects = projectsArray.filter(p => p.status === 'planning').length;
+    const activeProjects = projectsArray.filter(p => p.status === 'active').length;
+    const onHoldProjects = projectsArray.filter(p => p.status === 'on-hold').length;
+    const completedProjects = projectsArray.filter(p => p.status === 'completed').length;
+    const cancelledProjects = projectsArray.filter(p => p.status === 'cancelled').length;
 
     // Combined metrics
-    const totalActiveWork = workRequests.filter(r => 
+    const totalActiveWork = workRequestsArray.filter(r => 
       ['pending', 'in-progress', 'quoted', 'po-received'].includes(r.status)
     ).length;
     
-    const totalCompletedWork = workRequests.filter(r => 
+    const totalCompletedWork = workRequestsArray.filter(r => 
       ['completed', 'shipped'].includes(r.status)
     ).length;
 
-    const totalRevenue = workRequests
+    const totalRevenue = workRequestsArray
       .filter(r => r.invoiceNumber && r.invoiceNumber.trim() !== '')
       .length; // Count invoiced projects
 
-    const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
-    const totalActualCost = projects.reduce((sum, p) => sum + (p.actualCost || 0), 0);
+    const totalBudget = projectsArray.reduce((sum, p) => sum + (p.budget || 0), 0);
+    const totalActualCost = projectsArray.reduce((sum, p) => sum + (p.actualCost || 0), 0);
 
-    const avgProjectTime = workRequests
+    const avgProjectTime = workRequestsArray
       .filter(r => r.shipDate && r.createdAt)
       .reduce((acc, r) => {
         const startDate = new Date(r.createdAt);
@@ -84,17 +91,17 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
 
   // Filter work requests
   const filteredWorkRequests = useMemo(() => {
-    return workRequests.filter(request => {
+    const workRequestsArray = Array.isArray(workRequests) ? workRequests : [];
+    return workRequestsArray.filter(request => {
       const matchesStatus = filterStatus === 'all' || request.status === filterStatus;
       const matchesCustomer = filterCustomer === 'all' || 
-        request.customer?._id === filterCustomer ||
-        request.customer?.company?.toLowerCase().includes(filterCustomer.toLowerCase());
+        request.customer_id === filterCustomer ||
+        request.customer_name?.toLowerCase().includes(filterCustomer.toLowerCase());
       const matchesSearch = searchTerm === '' || 
-        request.workRequestDetails.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        request.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        request.customer?.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        request.quoteNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        request.poNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+        request.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.quote_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.po_number?.toLowerCase().includes(searchTerm.toLowerCase());
       
       return matchesStatus && matchesCustomer && matchesSearch;
     });
@@ -102,18 +109,18 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
 
   // Filter projects
   const filteredProjects = useMemo(() => {
-    return projects.filter(project => {
+    const projectsArray = Array.isArray(projects) ? projects : [];
+    return projectsArray.filter(project => {
       const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
       const matchesCustomer = filterCustomer === 'all' || 
-        project.customer?._id === filterCustomer ||
-        project.customer?.company?.toLowerCase().includes(filterCustomer.toLowerCase());
+        project.customer_id === filterCustomer ||
+        project.customer_name?.toLowerCase().includes(filterCustomer.toLowerCase());
       const matchesSearch = searchTerm === '' || 
-        project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.projectDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.customer?.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.quoteNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.poNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+        project.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.quote_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.po_number?.toLowerCase().includes(searchTerm.toLowerCase());
       
       return matchesStatus && matchesCustomer && matchesSearch;
     });
@@ -313,12 +320,12 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
       {filteredProjects.length > 0 ? (
         <div className={`projects-container ${viewMode}`}>
           {filteredProjects.map(project => (
-            <div key={project._id} className="project-card">
+            <div key={project.id} className="project-card">
               <div className="project-header">
                 <div className="project-info">
-                  <h3 className="project-name">{project.projectName}</h3>
-                  <div className="project-customer">{project.customer?.company || project.customer?.name}</div>
-                  <div className="project-type">{project.projectType}</div>
+                  <h3 className="project-name">{project.name}</h3>
+                                      <div className="project-customer">{project.customer_name}</div>
+                                      <div className="project-type">{project.type}</div>
                 </div>
                 <div className="project-status">
                   <span 
@@ -338,7 +345,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
 
               <div className="project-details">
                 <div className="project-description">
-                  {project.projectDescription || 'No description provided'}
+                  {project.description || 'No description provided'}
                 </div>
                 
                 <div className="project-metrics">
@@ -394,7 +401,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
               <div className="project-actions">
                 <div className="action-buttons">
                   <Link 
-                    to={`/edit-project/${project._id}`}
+                    to={`/edit-project/${project.id}`}
                     className="btn btn-outline btn-sm"
                     title="Edit project"
                   >
@@ -402,7 +409,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
                     Edit
                   </Link>
                   <button
-                    onClick={() => handleProjectDelete(project._id)}
+                    onClick={() => handleProjectDelete(project.id)}
                     className="btn-delete"
                   >
                     Delete
@@ -410,7 +417,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
                 </div>
                 <select
                   value={project.status}
-                  onChange={(e) => handleProjectStatusUpdate(project._id, e.target.value)}
+                  onChange={(e) => handleProjectStatusUpdate(project.id, e.target.value)}
                   className="status-select"
                   style={{ borderColor: getStatusColor(project.status) }}
                 >
@@ -454,7 +461,7 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
         <div className={`work-requests-container ${viewMode}`}>
           {filteredWorkRequests.map(request => (
             <WorkRequestCard
-              key={request._id}
+              key={request.id}
               workRequest={request}
               onStatusUpdate={handleStatusUpdate}
               onDelete={handleDelete}
@@ -474,6 +481,18 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
       )}
     </>
   );
+
+  // Show loading state if data is not ready
+  if (isLoading) {
+    return (
+      <div className="dashboard-container">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-container">
@@ -559,8 +578,8 @@ const Dashboard = ({ workRequests, customers, projects, onUpdateWorkRequest, onD
           >
             <option value="all">All Customers</option>
             {customers.map(customer => (
-              <option key={customer._id} value={customer._id}>
-                {customer.company || customer.name}
+                              <option key={customer.id} value={customer.id}>
+                                  {customer.name}
               </option>
             ))}
           </select>

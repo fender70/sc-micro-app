@@ -13,6 +13,7 @@ import ProjectForm from './components/ProjectForm.jsx';
 import ProjectEditForm from './components/ProjectEditForm.jsx';
 import CSVUpload from './components/CSVUpload.jsx';
 import CustomersOverview from './components/CustomersOverview.jsx';
+import ChatInterface from './components/ChatInterface.jsx';
 import './App.css';
 
 function App() {
@@ -27,17 +28,36 @@ function App() {
 
   const fetchData = async () => {
     try {
+      console.log('Fetching data from database API...');
       const [workRequestsRes, customersRes, projectsRes] = await Promise.all([
-        axios.get('/api/workrequests'),
-        axios.get('/api/customers'),
-        axios.get('/api/projects')
+        axios.get('/api/database/work-requests', { timeout: 5000 }),
+        axios.get('/api/database/customers', { timeout: 5000 }),
+        axios.get('/api/database/projects', { timeout: 5000 })
       ]);
+      
+      console.log('Data fetched successfully:', {
+        workRequests: workRequestsRes.data.length,
+        customers: customersRes.data.length,
+        projects: projectsRes.data.length
+      });
+
       
       setWorkRequests(workRequestsRes.data);
       setCustomers(customersRes.data);
       setProjects(projectsRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: error.config?.url
+      });
+      
+      // Set empty arrays to prevent infinite loading
+      setWorkRequests([]);
+      setCustomers([]);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -45,7 +65,7 @@ function App() {
 
   const addWorkRequest = async (workRequestData) => {
     try {
-      const response = await axios.post('/api/workrequests', workRequestData);
+      const response = await axios.post('/api/database/work-requests', workRequestData);
       setWorkRequests([response.data, ...workRequests]);
       return response.data;
     } catch (error) {
@@ -56,9 +76,9 @@ function App() {
 
   const updateWorkRequest = async (id, workRequestData) => {
     try {
-      const response = await axios.put(`/api/workrequests/${id}`, workRequestData);
+      const response = await axios.put(`/api/database/work-requests/${id}`, workRequestData);
       setWorkRequests(workRequests.map(wr => 
-        wr._id === id ? response.data : wr
+        wr.id === id ? response.data : wr
       ));
       return response.data;
     } catch (error) {
@@ -69,8 +89,8 @@ function App() {
 
   const deleteWorkRequest = async (id) => {
     try {
-      await axios.delete(`/api/workrequests/${id}`);
-      setWorkRequests(workRequests.filter(wr => wr._id !== id));
+      await axios.delete(`/api/database/work-requests/${id}`);
+      setWorkRequests(workRequests.filter(wr => wr.id !== id));
     } catch (error) {
       console.error('Error deleting work request:', error);
       throw error;
@@ -79,7 +99,7 @@ function App() {
 
   const addCustomer = async (customerData) => {
     try {
-      const response = await axios.post('/api/customers', customerData);
+      const response = await axios.post('/api/database/customers', customerData);
       setCustomers([...customers, response.data]);
       return response.data;
     } catch (error) {
@@ -90,9 +110,9 @@ function App() {
 
   const updateCustomer = async (id, customerData) => {
     try {
-      const response = await axios.put(`/api/customers/${id}`, customerData);
+      const response = await axios.put(`/api/database/customers/${id}`, customerData);
       setCustomers(customers.map(c => 
-        c._id === id ? response.data : c
+        c.id === id ? response.data : c
       ));
       return response.data;
     } catch (error) {
@@ -103,7 +123,7 @@ function App() {
 
   const addProject = async (projectData) => {
     try {
-      const response = await axios.post('/api/projects', projectData);
+      const response = await axios.post('/api/database/projects', projectData);
       setProjects([response.data, ...projects]);
       return response.data;
     } catch (error) {
@@ -114,9 +134,9 @@ function App() {
 
   const updateProject = async (id, projectData) => {
     try {
-      const response = await axios.put(`/api/projects/${id}`, projectData);
+      const response = await axios.put(`/api/database/projects/${id}`, projectData);
       setProjects(projects.map(p => 
-        p._id === id ? response.data : p
+        p.id === id ? response.data : p
       ));
       return response.data;
     } catch (error) {
@@ -127,8 +147,8 @@ function App() {
 
   const deleteProject = async (id) => {
     try {
-      await axios.delete(`/api/projects/${id}`);
-      setProjects(projects.filter(p => p._id !== id));
+      await axios.delete(`/api/database/projects/${id}`);
+      setProjects(projects.filter(p => p.id !== id));
     } catch (error) {
       console.error('Error deleting project:', error);
       throw error;
@@ -146,7 +166,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="App">
           <Header />
           <main className="main-content">
@@ -227,6 +247,7 @@ function App() {
               path="/add-project" 
               element={
                 <ProjectForm 
+                  customers={customers}
                   onSubmit={addProject}
                 />
               } 
@@ -251,6 +272,7 @@ function App() {
             />
                       </Routes>
           </main>
+          <ChatInterface />
         </div>
       </Router>
     </ThemeProvider>

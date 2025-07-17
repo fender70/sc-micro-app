@@ -6,13 +6,12 @@ import './WorkRequestForm.css';
 const WorkRequestForm = ({ customers, onSubmit }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    customerId: '',
-    workRequestDetails: '',
-    quoteNumber: '',
-    poNumber: '',
-    scMicroReport: '',
-    invoiceNumber: '',
-    shipDate: '',
+    customer_id: '',
+    description: '',
+    quote_number: '',
+    po_number: '',
+    invoice_number: '',
+    target_date: '',
     status: 'pending'
   });
   const [loading, setLoading] = useState(false);

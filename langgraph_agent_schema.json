@@ -1,0 +1,579 @@
+{
+  "name": "SC Micro Enterprise Assistant",
+  "description": "An intelligent assistant for the SC Micro Enterprise Management System that helps users navigate the application, understand their data, and perform common tasks.",
+  "version": "1.0.0",
+  "nodes": {
+    "user_input_processor": {
+      "description": "Processes and categorizes user input to determine the appropriate action",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_message": {
+            "type": "string",
+            "description": "The user's natural language input"
+          },
+          "current_page": {
+            "type": "string",
+            "description": "The current page/route the user is on"
+          },
+          "user_role": {
+            "type": "string",
+            "enum": ["admin", "manager", "operator", "viewer"],
+            "description": "The user's role in the system"
+          }
+        },
+        "required": ["user_message"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "intent": {
+            "type": "string",
+            "enum": [
+              "dashboard_analysis",
+              "work_request_management",
+              "customer_management",
+              "project_tracking",
+              "data_import_export",
+              "reporting",
+              "navigation",
+              "help",
+              "error_troubleshooting"
+            ]
+          },
+          "entities": {
+            "type": "object",
+            "properties": {
+              "customer_name": {"type": "string"},
+              "project_type": {"type": "string"},
+              "status": {"type": "string"},
+              "date_range": {"type": "object"},
+              "priority": {"type": "string"}
+            }
+          },
+          "confidence": {"type": "number"}
+        }
+      }
+    },
+    "dashboard_analyzer": {
+      "description": "Analyzes dashboard data and provides insights",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "work_requests": {"type": "array"},
+          "customers": {"type": "array"},
+          "projects": {"type": "array"},
+          "analysis_type": {
+            "type": "string",
+            "enum": ["overview", "trends", "performance", "alerts"]
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "insights": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {"type": "string"},
+                "message": {"type": "string"},
+                "severity": {"type": "string"},
+                "action_needed": {"type": "boolean"}
+              }
+            }
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "metrics_summary": {
+            "type": "object",
+            "properties": {
+              "total_requests": {"type": "number"},
+              "pending_requests": {"type": "number"},
+              "completion_rate": {"type": "number"},
+              "average_project_time": {"type": "number"}
+            }
+          }
+        }
+      }
+    },
+    "work_request_assistant": {
+      "description": "Helps users manage work requests",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["create", "update", "search", "analyze", "bulk_operations"]
+          },
+          "work_request_data": {"type": "object"},
+          "search_criteria": {"type": "object"},
+          "customer_context": {"type": "object"}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {"type": "string"},
+                "suggestion": {"type": "string"},
+                "reason": {"type": "string"}
+              }
+            }
+          },
+          "validation_errors": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "similar_requests": {
+            "type": "array",
+            "items": {"type": "object"}
+          },
+          "estimated_completion": {"type": "string"}
+        }
+      }
+    },
+    "customer_relationship_manager": {
+      "description": "Manages customer relationships and provides insights",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["analyze", "tier_assessment", "contact_management", "project_history"]
+          },
+          "customer_data": {"type": "object"},
+          "historical_data": {"type": "array"}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "customer_tier": {
+            "type": "string",
+            "enum": ["Premium", "Gold", "Silver", "Bronze"]
+          },
+          "relationship_score": {"type": "number"},
+          "recommendations": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "risk_factors": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "opportunities": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "project_optimizer": {
+      "description": "Optimizes project planning and resource allocation",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project_data": {"type": "object"},
+          "resource_constraints": {"type": "object"},
+          "timeline_requirements": {"type": "object"}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "optimized_timeline": {
+            "type": "object",
+            "properties": {
+              "start_date": {"type": "string"},
+              "end_date": {"type": "string"},
+              "milestones": {"type": "array"}
+            }
+          },
+          "resource_allocation": {
+            "type": "object",
+            "properties": {
+              "team_members": {"type": "array"},
+              "equipment": {"type": "array"},
+              "materials": {"type": "array"}
+            }
+          },
+          "risk_assessment": {
+            "type": "object",
+            "properties": {
+              "high_risk_factors": {"type": "array"},
+              "mitigation_strategies": {"type": "array"}
+            }
+          }
+        }
+      }
+    },
+    "data_import_export_helper": {
+      "description": "Assists with CSV import/export operations",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": ["import", "export", "template_generation", "validation"]
+          },
+          "file_data": {"type": "object"},
+          "mapping_rules": {"type": "object"}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "validation_results": {
+            "type": "object",
+            "properties": {
+              "valid_rows": {"type": "number"},
+              "invalid_rows": {"type": "number"},
+              "errors": {"type": "array"}
+            }
+          },
+          "mapping_suggestions": {
+            "type": "object",
+            "properties": {
+              "field_mappings": {"type": "object"},
+              "data_transformations": {"type": "array"}
+            }
+          },
+          "import_preview": {
+            "type": "array",
+            "items": {"type": "object"}
+          }
+        }
+      }
+    },
+    "report_generator": {
+      "description": "Generates custom reports and analytics",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "report_type": {
+            "type": "string",
+            "enum": ["performance", "financial", "customer", "operational", "custom"]
+          },
+          "date_range": {"type": "object"},
+          "filters": {"type": "object"},
+          "format": {
+            "type": "string",
+            "enum": ["summary", "detailed", "visual", "export"]
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "report_data": {"type": "object"},
+          "visualizations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {"type": "string"},
+                "data": {"type": "object"},
+                "config": {"type": "object"}
+              }
+            }
+          },
+          "insights": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "navigation_helper": {
+      "description": "Helps users navigate the application",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_goal": {"type": "string"},
+          "current_location": {"type": "string"},
+          "user_experience_level": {"type": "string"}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "navigation_path": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "step": {"type": "number"},
+                "action": {"type": "string"},
+                "description": {"type": "string"},
+                "route": {"type": "string"}
+              }
+            }
+          },
+          "shortcuts": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "tips": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "error_troubleshooter": {
+      "description": "Helps troubleshoot errors and issues",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "error_message": {"type": "string"},
+          "error_code": {"type": "string"},
+          "user_action": {"type": "string"},
+          "system_state": {"type": "object"}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "diagnosis": {"type": "string"},
+          "solution_steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "step": {"type": "number"},
+                "action": {"type": "string"},
+                "explanation": {"type": "string"}
+              }
+            }
+          },
+          "prevention_tips": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "escalation_needed": {"type": "boolean"}
+        }
+      }
+    },
+    "response_generator": {
+      "description": "Generates user-friendly responses",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "node_outputs": {"type": "object"},
+          "user_context": {"type": "object"},
+          "response_type": {
+            "type": "string",
+            "enum": ["informational", "actionable", "confirmational", "error"]
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "response_message": {"type": "string"},
+          "suggested_actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "action": {"type": "string"},
+                "description": {"type": "string"},
+                "route": {"type": "string"}
+              }
+            }
+          },
+          "follow_up_questions": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    }
+  },
+  "edges": [
+    {
+      "from": "user_input_processor",
+      "to": "dashboard_analyzer",
+      "condition": "intent == 'dashboard_analysis'"
+    },
+    {
+      "from": "user_input_processor",
+      "to": "work_request_assistant",
+      "condition": "intent == 'work_request_management'"
+    },
+    {
+      "from": "user_input_processor",
+      "to": "customer_relationship_manager",
+      "condition": "intent == 'customer_management'"
+    },
+    {
+      "from": "user_input_processor",
+      "to": "project_optimizer",
+      "condition": "intent == 'project_tracking'"
+    },
+    {
+      "from": "user_input_processor",
+      "to": "data_import_export_helper",
+      "condition": "intent == 'data_import_export'"
+    },
+    {
+      "from": "user_input_processor",
+      "to": "report_generator",
+      "condition": "intent == 'reporting'"
+    },
+    {
+      "from": "user_input_processor",
+      "to": "navigation_helper",
+      "condition": "intent == 'navigation'"
+    },
+    {
+      "from": "user_input_processor",
+      "to": "error_troubleshooter",
+      "condition": "intent == 'error_troubleshooting'"
+    },
+    {
+      "from": "dashboard_analyzer",
+      "to": "response_generator"
+    },
+    {
+      "from": "work_request_assistant",
+      "to": "response_generator"
+    },
+    {
+      "from": "customer_relationship_manager",
+      "to": "response_generator"
+    },
+    {
+      "from": "project_optimizer",
+      "to": "response_generator"
+    },
+    {
+      "from": "data_import_export_helper",
+      "to": "response_generator"
+    },
+    {
+      "from": "report_generator",
+      "to": "response_generator"
+    },
+    {
+      "from": "navigation_helper",
+      "to": "response_generator"
+    },
+    {
+      "from": "error_troubleshooter",
+      "to": "response_generator"
+    }
+  ],
+  "config": {
+    "recursion_limit": 25,
+    "interrupt_before": ["response_generator"],
+    "interrupt_after": ["user_input_processor"],
+    "state_schema": {
+      "type": "object",
+      "properties": {
+        "user_message": {"type": "string"},
+        "current_page": {"type": "string"},
+        "user_role": {"type": "string"},
+        "session_history": {
+          "type": "array",
+          "items": {"type": "object"}
+        },
+        "work_requests": {"type": "array"},
+        "customers": {"type": "array"},
+        "projects": {"type": "array"},
+        "node_outputs": {"type": "object"},
+        "final_response": {"type": "object"}
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "get_dashboard_data",
+      "description": "Retrieves current dashboard metrics and data",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "metrics": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    {
+      "name": "search_work_requests",
+      "description": "Searches work requests based on criteria",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "customer": {"type": "string"},
+          "status": {"type": "string"},
+          "date_range": {"type": "object"},
+          "project_type": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "get_customer_details",
+      "description": "Retrieves detailed customer information",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {"type": "string"},
+          "include_projects": {"type": "boolean"},
+          "include_work_requests": {"type": "boolean"}
+        }
+      }
+    },
+    {
+      "name": "create_work_request",
+      "description": "Creates a new work request",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {"type": "string"},
+          "project_type": {"type": "string"},
+          "description": {"type": "string"},
+          "priority": {"type": "string"},
+          "target_date": {"type": "string"}
+        },
+        "required": ["customer_id", "project_type", "description"]
+      }
+    },
+    {
+      "name": "export_data",
+      "description": "Exports data in various formats",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "data_type": {"type": "string"},
+          "format": {"type": "string"},
+          "filters": {"type": "object"}
+        }
+      }
+    },
+    {
+      "name": "navigate_to_page",
+      "description": "Navigates to a specific page in the application",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "route": {"type": "string"},
+          "params": {"type": "object"}
+        }
+      }
+    }
+  ]
+} 

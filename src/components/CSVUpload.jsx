@@ -80,8 +80,8 @@ const CSVUpload = ({ onUploadSuccess }) => {
     setUploadResult(null);
 
     const formData = new FormData();
-    formData.append('csvFile', selectedFile);
-    formData.append('csvType', csvType);
+    formData.append('file', selectedFile);
+    formData.append('type', csvType);
 
     try {
       const response = await axios.post('/api/csv/upload', formData, {
