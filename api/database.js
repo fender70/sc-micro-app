@@ -13,7 +13,7 @@ dbManager.initialize().catch(error => {
 router.get('/customers', cors(), async (req, res) => {
     try {
         const customers = await dbManager.getCustomers();
-        res.json(customers);
+        res.json(customers || []);
     } catch (error) {
         console.error('Error fetching customers:', error);
         res.status(500).json({ error: 'Failed to fetch customers' });
@@ -86,7 +86,7 @@ router.delete('/customers/:id', cors(), async (req, res) => {
 router.get('/work-requests', cors(), async (req, res) => {
     try {
         const workRequests = await dbManager.getWorkRequests();
-        res.json(workRequests);
+        res.json(workRequests || []);
     } catch (error) {
         console.error('Error fetching work requests:', error);
         res.status(500).json({ error: 'Failed to fetch work requests' });
@@ -151,7 +151,7 @@ router.delete('/work-requests/:id', cors(), async (req, res) => {
 router.get('/projects', cors(), async (req, res) => {
     try {
         const projects = await dbManager.getProjects();
-        res.json(projects);
+        res.json(projects || []);
     } catch (error) {
         console.error('Error fetching projects:', error);
         res.status(500).json({ error: 'Failed to fetch projects' });

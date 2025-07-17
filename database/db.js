@@ -91,7 +91,7 @@ class DatabaseManager {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows || []);
                 }
             });
         });
@@ -200,7 +200,7 @@ class DatabaseManager {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows || []);
                 }
             });
         });
@@ -330,7 +330,7 @@ class DatabaseManager {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows || []);
                 }
             });
         });
