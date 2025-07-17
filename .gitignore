@@ -74,6 +74,8 @@ temp_agent_*.py
 *_GUIDE.md
 *_README.md
 TROUBLESHOOTING.md
+# Keep deployment guide
+!DEPLOYMENT_GUIDE.md
 
 # Environment variables
 .env
