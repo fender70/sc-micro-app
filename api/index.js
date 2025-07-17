@@ -165,17 +165,7 @@ app.delete('/api/projects/:id', async (req, res) => {
   }
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('API Error:', err);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: err.message 
-  });
-});
-
-
-
+// CSV Template endpoint
 app.get('/api/csv/template', (req, res) => {
   try {
     const { type } = req.query;
@@ -205,6 +195,15 @@ app.get('/api/csv/template', (req, res) => {
     console.error('CSV template error:', error);
     res.status(500).json({ error: 'CSV template download failed' });
   }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('API Error:', err);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: err.message 
+  });
 });
 
 // Export the Express app
