@@ -6,7 +6,7 @@ const config = {
   },
   // Production - deployed backend
   production: {
-    apiBaseUrl: process.env.REACT_APP_API_URL || 'https://your-app-name-production.up.railway.app'
+    apiBaseUrl: process.env.REACT_APP_API_URL || 'https://sc-micro-app-production.up.railway.app'
   }
 };
 
