@@ -14,6 +14,7 @@ const config = {
 console.log('=== CONFIG DEBUG ===');
 console.log('Environment:', process.env.NODE_ENV);
 console.log('API URL:', process.env.REACT_APP_API_URL);
+console.log('All env vars:', Object.keys(process.env).filter(key => key.includes('REACT_APP')));
 console.log('Using API Base URL:', config[process.env.NODE_ENV || 'development'].apiBaseUrl);
 console.log('===================');
 
