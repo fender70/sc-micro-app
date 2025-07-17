@@ -160,11 +160,11 @@ const WorkRequestCard = ({ workRequest, onStatusUpdate, onDelete }) => {
             <FiEdit />
             Edit
           </Link>
-                        <button 
+          <button 
                 onClick={() => onDelete(workRequest.id)}
-                className="btn-delete"
-                title="Delete work request"
-              >
+            className="btn-delete"
+            title="Delete work request"
+          >
             <FiTrash2 />
             Delete
           </button>

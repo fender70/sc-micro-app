@@ -73,9 +73,9 @@ temp_agent_*.py
 # Documentation guides (not needed for portfolio)
 *_GUIDE.md
 *_README.md
-TROUBLESHOOTING.md
+docs/TROUBLESHOOTING.md
 # Keep deployment guide
-!DEPLOYMENT_GUIDE.md
+!docs/DEPLOYMENT_GUIDE.md
 
 # Environment variables
 .env

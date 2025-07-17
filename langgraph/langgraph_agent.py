@@ -88,7 +88,7 @@ def get_work_requests() -> str:
         response = requests.get('http://localhost:3001/api/database/work-requests', timeout=5)
         if response.status_code == 200:
             work_requests = response.json()
-            return json.dumps(work_requests, indent=2)
+    return json.dumps(work_requests, indent=2)
         else:
             logger.error(f"Failed to fetch work requests: {response.status_code}")
             return json.dumps([], indent=2)
@@ -103,7 +103,7 @@ def get_customers() -> str:
         response = requests.get('http://localhost:3001/api/database/customers', timeout=5)
         if response.status_code == 200:
             customers = response.json()
-            return json.dumps(customers, indent=2)
+    return json.dumps(customers, indent=2)
         else:
             logger.error(f"Failed to fetch customers: {response.status_code}")
             return json.dumps([], indent=2)
@@ -118,7 +118,7 @@ def get_projects() -> str:
         response = requests.get('http://localhost:3001/api/database/projects', timeout=5)
         if response.status_code == 200:
             projects = response.json()
-            return json.dumps(projects, indent=2)
+    return json.dumps(projects, indent=2)
         else:
             logger.error(f"Failed to fetch projects: {response.status_code}")
             return json.dumps([], indent=2)
@@ -151,17 +151,17 @@ def get_dashboard_metrics() -> str:
     except Exception as e:
         logger.error(f"Error fetching dashboard metrics: {e}")
         # Fallback to mock metrics
-        metrics = {
-            "total_work_requests": 5,
-            "pending_requests": 2,
-            "completed_requests": 3,
-            "completion_rate": 0.85,
-            "average_project_time": 45,
-            "total_revenue": 125000,
-            "active_customers": 3,
-            "high_priority_items": 1
-        }
-        return json.dumps(metrics, indent=2)
+    metrics = {
+        "total_work_requests": 5,
+        "pending_requests": 2,
+        "completed_requests": 3,
+        "completion_rate": 0.85,
+        "average_project_time": 45,
+        "total_revenue": 125000,
+        "active_customers": 3,
+        "high_priority_items": 1
+    }
+    return json.dumps(metrics, indent=2)
 
 @tool
 def create_work_request(customer: str, project_type: str, description: str, priority: str, target_date: str) -> str:
@@ -182,10 +182,10 @@ def create_work_request(customer: str, project_type: str, description: str, prio
         work_request_data = {
             "customer_id": customer_obj['id'],
             "customer_name": customer_obj['name'],
-            "project_type": project_type,
-            "description": description,
-            "priority": priority,
-            "target_date": target_date,
+        "project_type": project_type,
+        "description": description,
+        "priority": priority,
+        "target_date": target_date,
             "status": "pending"
         }
         
@@ -194,7 +194,7 @@ def create_work_request(customer: str, project_type: str, description: str, prio
         
         if response.status_code == 201:
             new_request = response.json()
-            return json.dumps({"success": True, "work_request": new_request}, indent=2)
+    return json.dumps({"success": True, "work_request": new_request}, indent=2)
         else:
             return json.dumps({"success": False, "error": f"Failed to create work request: {response.status_code}"}, indent=2)
     except Exception as e:
@@ -223,11 +223,11 @@ def update_work_request(request_id: str, status: str, notes: str = "") -> str:
                                      json=update_data, timeout=5)
         
         if update_response.status_code == 200:
-            return json.dumps({
-                "success": True,
-                "message": f"Work request {request_id} updated to status: {status}",
-                "updated_at": datetime.now().isoformat()
-            }, indent=2)
+    return json.dumps({
+        "success": True,
+        "message": f"Work request {request_id} updated to status: {status}",
+        "updated_at": datetime.now().isoformat()
+    }, indent=2)
         else:
             return json.dumps({"success": False, "error": f"Failed to update work request: {update_response.status_code}"}, indent=2)
     except Exception as e:

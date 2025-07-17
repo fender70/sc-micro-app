@@ -3,7 +3,7 @@
 
 import express from 'express';
 import cors from 'cors';
-import LangGraphBridge from '../langgraph_bridge.js';
+import LangGraphBridge from '../langgraph/langgraph_bridge.js';
 
 const router = express.Router();
 

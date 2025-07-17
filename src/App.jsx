@@ -36,13 +36,17 @@ function App() {
         axios.get(API_ENDPOINTS.projects, { timeout: 5000 })
       ]);
       
+      // Debug logs: print the full data and their types
+      console.log('Full workRequests response:', workRequestsRes.data, 'Type:', typeof workRequestsRes.data, Array.isArray(workRequestsRes.data));
+      console.log('Full customers response:', customersRes.data, 'Type:', typeof customersRes.data, Array.isArray(customersRes.data));
+      console.log('Full projects response:', projectsRes.data, 'Type:', typeof projectsRes.data, Array.isArray(projectsRes.data));
+      
       console.log('Data fetched successfully:', {
         workRequests: workRequestsRes.data.length,
         customers: customersRes.data.length,
         projects: projectsRes.data.length
       });
 
-      
       setWorkRequests(workRequestsRes.data);
       setCustomers(customersRes.data);
       setProjects(projectsRes.data);

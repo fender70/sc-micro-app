@@ -10,7 +10,7 @@
     "backend": "node server.js",
     "start": "node server.js",
     "dev:full": "concurrently \"npm run backend\" \"npm run dev\"",
-    "test:server": "node test-server.js",
+    "test:server": "node scripts/test-server.js",
     "build": "vite build",
     "vercel-build": "vite build",
     "lint": "eslint .",

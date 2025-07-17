@@ -38,7 +38,7 @@ black>=23.0.0
 flake8>=6.0.0
 
 # Environment management
-python-dotenv>=1.0.0
+python-dotenv>=1.0.0 
 
 # Optional: For local LLM support
 langchain-community>=0.2.0

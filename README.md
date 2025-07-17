@@ -65,7 +65,7 @@ sc-micro-app/
 ├── database/              # Database layer
 │   ├── db.js             # Database manager
 │   └── schema.sql        # Database schema
-└── langgraph_agent.py    # AI agent implementation
+└── langgraph/langgraph_agent.py    # AI agent implementation
 ```
 
 ## 🚀 Getting Started
@@ -109,7 +109,7 @@ sc-micro-app/
    npm run backend
    
    # Terminal 3: AI Agent (optional)
-   python3 langgraph_agent.py
+   python3 langgraph/langgraph_agent.py
    ```
 
 6. **Open your browser**

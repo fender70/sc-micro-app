@@ -17,10 +17,10 @@ const CustomerForm = ({ onSubmit }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
   };
 
   const handleSubmit = async (e) => {
@@ -121,8 +121,8 @@ const CustomerForm = ({ onSubmit }) => {
             <textarea
               name="address"
               value={formData.address}
-              onChange={handleChange}
-              className="form-input"
+                onChange={handleChange}
+                className="form-input"
               placeholder="Enter full address"
               rows="3"
             />

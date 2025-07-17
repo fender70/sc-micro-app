@@ -133,7 +133,7 @@ const CustomerDetailView = ({ customers, workRequests, projects, onRefresh }) =>
   }, [customer, workRequests, projects, id]);
 
   useEffect(() => {
-    setLoading(false);
+      setLoading(false);
   }, [customer]);
 
   const getStatusColor = (status) => {

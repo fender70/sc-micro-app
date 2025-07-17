@@ -53,7 +53,7 @@ app.post('/api/workrequests', (req, res) => {
   try {
     const newWorkRequestId = dbManager.createWorkRequest(req.body);
     const newWorkRequest = dbManager.getWorkRequestById(newWorkRequestId);
-    res.status(201).json(newWorkRequest);
+  res.status(201).json(newWorkRequest);
   } catch (error) {
     console.error('Error creating work request:', error);
     res.status(500).json({ error: 'Failed to create work request', details: error.message });
@@ -95,7 +95,7 @@ app.post('/api/customers', (req, res) => {
   try {
     const newCustomerId = dbManager.createCustomer(req.body);
     const newCustomer = dbManager.getCustomerById(newCustomerId);
-    res.status(201).json(newCustomer);
+  res.status(201).json(newCustomer);
   } catch (error) {
     console.error('Error creating customer:', error);
     res.status(500).json({ error: 'Failed to create customer', details: error.message });
@@ -137,7 +137,7 @@ app.post('/api/projects', (req, res) => {
   try {
     const newProjectId = dbManager.createProject(req.body);
     const newProject = dbManager.getProjectById(newProjectId);
-    res.status(201).json(newProject);
+  res.status(201).json(newProject);
   } catch (error) {
     console.error('Error creating project:', error);
     res.status(500).json({ error: 'Failed to create project', details: error.message });
