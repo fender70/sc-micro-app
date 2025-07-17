@@ -9,8 +9,8 @@ lerna-debug.log*
 
 # Dependencies
 node_modules
-dist
-dist-ssr
+dist/
+dist-ssr/
 *.local
 
 # Environment variables
