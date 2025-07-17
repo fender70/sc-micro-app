@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiUpload, FiDownload, FiFileText, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config.js';
 import './CSVUpload.css';
 
 const CSVUpload = ({ onUploadSuccess }) => {
@@ -84,7 +85,7 @@ const CSVUpload = ({ onUploadSuccess }) => {
     formData.append('type', csvType);
 
     try {
-      const response = await axios.post('/api/csv/upload', formData, {
+      const response = await axios.post(API_ENDPOINTS.csvUpload, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -107,7 +108,7 @@ const CSVUpload = ({ onUploadSuccess }) => {
 
   const handleDownloadTemplate = async () => {
     try {
-      const response = await axios.get(`/api/csv/template?type=${csvType}`, {
+      const response = await axios.get(`${API_ENDPOINTS.csvTemplate}?type=${csvType}`, {
         responseType: 'blob',
       });
 
