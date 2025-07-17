@@ -39,9 +39,9 @@ app.get('/api/test', (req, res) => {
 dbManager.initialize();
 
 // Routes
-app.get('/api/workrequests', (req, res) => {
+app.get('/api/workrequests', async (req, res) => {
   try {
-    const allWorkRequests = dbManager.getWorkRequests();
+    const allWorkRequests = await dbManager.getWorkRequests();
     res.json(allWorkRequests);
   } catch (error) {
     console.error('Error in /api/workrequests:', error);
@@ -49,21 +49,21 @@ app.get('/api/workrequests', (req, res) => {
   }
 });
 
-app.post('/api/workrequests', (req, res) => {
+app.post('/api/workrequests', async (req, res) => {
   try {
-    const newWorkRequestId = dbManager.createWorkRequest(req.body);
-    const newWorkRequest = dbManager.getWorkRequestById(newWorkRequestId);
-  res.status(201).json(newWorkRequest);
+    const newWorkRequestId = await dbManager.createWorkRequest(req.body);
+    const newWorkRequest = await dbManager.getWorkRequestById(newWorkRequestId);
+    res.status(201).json(newWorkRequest);
   } catch (error) {
     console.error('Error creating work request:', error);
     res.status(500).json({ error: 'Failed to create work request', details: error.message });
   }
 });
 
-app.put('/api/workrequests/:id', (req, res) => {
+app.put('/api/workrequests/:id', async (req, res) => {
   try {
-    dbManager.updateWorkRequest(req.params.id, req.body);
-    const updatedWorkRequest = dbManager.getWorkRequestById(req.params.id);
+    await dbManager.updateWorkRequest(req.params.id, req.body);
+    const updatedWorkRequest = await dbManager.getWorkRequestById(req.params.id);
     res.json(updatedWorkRequest);
   } catch (error) {
     console.error('Error updating work request:', error);
@@ -71,9 +71,9 @@ app.put('/api/workrequests/:id', (req, res) => {
   }
 });
 
-app.delete('/api/workrequests/:id', (req, res) => {
+app.delete('/api/workrequests/:id', async (req, res) => {
   try {
-    dbManager.deleteWorkRequest(req.params.id);
+    await dbManager.deleteWorkRequest(req.params.id);
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting work request:', error);
@@ -81,9 +81,9 @@ app.delete('/api/workrequests/:id', (req, res) => {
   }
 });
 
-app.get('/api/customers', (req, res) => {
+app.get('/api/customers', async (req, res) => {
   try {
-    const allCustomers = dbManager.getCustomers();
+    const allCustomers = await dbManager.getCustomers();
     res.json(allCustomers);
   } catch (error) {
     console.error('Error in /api/customers:', error);
@@ -91,21 +91,21 @@ app.get('/api/customers', (req, res) => {
   }
 });
 
-app.post('/api/customers', (req, res) => {
+app.post('/api/customers', async (req, res) => {
   try {
-    const newCustomerId = dbManager.createCustomer(req.body);
-    const newCustomer = dbManager.getCustomerById(newCustomerId);
-  res.status(201).json(newCustomer);
+    const newCustomerId = await dbManager.createCustomer(req.body);
+    const newCustomer = await dbManager.getCustomerById(newCustomerId);
+    res.status(201).json(newCustomer);
   } catch (error) {
     console.error('Error creating customer:', error);
     res.status(500).json({ error: 'Failed to create customer', details: error.message });
   }
 });
 
-app.put('/api/customers/:id', (req, res) => {
+app.put('/api/customers/:id', async (req, res) => {
   try {
-    dbManager.updateCustomer(req.params.id, req.body);
-    const updatedCustomer = dbManager.getCustomerById(req.params.id);
+    await dbManager.updateCustomer(req.params.id, req.body);
+    const updatedCustomer = await dbManager.getCustomerById(req.params.id);
     res.json(updatedCustomer);
   } catch (error) {
     console.error('Error updating customer:', error);
@@ -113,9 +113,9 @@ app.put('/api/customers/:id', (req, res) => {
   }
 });
 
-app.delete('/api/customers/:id', (req, res) => {
+app.delete('/api/customers/:id', async (req, res) => {
   try {
-    dbManager.deleteCustomer(req.params.id);
+    await dbManager.deleteCustomer(req.params.id);
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting customer:', error);
@@ -123,9 +123,9 @@ app.delete('/api/customers/:id', (req, res) => {
   }
 });
 
-app.get('/api/projects', (req, res) => {
+app.get('/api/projects', async (req, res) => {
   try {
-    const allProjects = dbManager.getProjects();
+    const allProjects = await dbManager.getProjects();
     res.json(allProjects);
   } catch (error) {
     console.error('Error in /api/projects:', error);
@@ -133,21 +133,21 @@ app.get('/api/projects', (req, res) => {
   }
 });
 
-app.post('/api/projects', (req, res) => {
+app.post('/api/projects', async (req, res) => {
   try {
-    const newProjectId = dbManager.createProject(req.body);
-    const newProject = dbManager.getProjectById(newProjectId);
-  res.status(201).json(newProject);
+    const newProjectId = await dbManager.createProject(req.body);
+    const newProject = await dbManager.getProjectById(newProjectId);
+    res.status(201).json(newProject);
   } catch (error) {
     console.error('Error creating project:', error);
     res.status(500).json({ error: 'Failed to create project', details: error.message });
   }
 });
 
-app.put('/api/projects/:id', (req, res) => {
+app.put('/api/projects/:id', async (req, res) => {
   try {
-    dbManager.updateProject(req.params.id, req.body);
-    const updatedProject = dbManager.getProjectById(req.params.id);
+    await dbManager.updateProject(req.params.id, req.body);
+    const updatedProject = await dbManager.getProjectById(req.params.id);
     res.json(updatedProject);
   } catch (error) {
     console.error('Error updating project:', error);
@@ -155,9 +155,9 @@ app.put('/api/projects/:id', (req, res) => {
   }
 });
 
-app.delete('/api/projects/:id', (req, res) => {
+app.delete('/api/projects/:id', async (req, res) => {
   try {
-    dbManager.deleteProject(req.params.id);
+    await dbManager.deleteProject(req.params.id);
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting project:', error);
