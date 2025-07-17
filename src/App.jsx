@@ -46,6 +46,11 @@ function App() {
       console.log('customers keys:', Object.keys(customersRes.data));
       console.log('projects keys:', Object.keys(projectsRes.data));
       
+      // Log the full response structure for debugging
+      console.log('workRequests full response:', JSON.stringify(workRequestsRes.data, null, 2));
+      console.log('customers full response:', JSON.stringify(customersRes.data, null, 2));
+      console.log('projects full response:', JSON.stringify(projectsRes.data, null, 2));
+      
       // Extract data from responses - handle both array and object responses
       const workRequestsData = Array.isArray(workRequestsRes.data) ? workRequestsRes.data : 
         (workRequestsRes.data.data || workRequestsRes.data.workRequests || workRequestsRes.data.results || []);
@@ -64,9 +69,10 @@ function App() {
         projects: projectsData.length
       });
 
-      setWorkRequests(workRequestsData);
-      setCustomers(customersData);
-      setProjects(projectsData);
+      // Ensure we always have valid arrays
+      setWorkRequests(Array.isArray(workRequestsData) ? workRequestsData : []);
+      setCustomers(Array.isArray(customersData) ? customersData : []);
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
     } catch (error) {
       console.error('Error fetching data:', error);
       console.error('Error details:', {
