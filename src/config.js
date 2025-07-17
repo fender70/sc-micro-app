@@ -10,6 +10,11 @@ const config = {
   }
 };
 
+// Debug logging
+console.log('Environment:', process.env.NODE_ENV);
+console.log('API URL:', process.env.REACT_APP_API_URL);
+console.log('Using API Base URL:', config[process.env.NODE_ENV || 'development'].apiBaseUrl);
+
 // Get current environment
 const environment = process.env.NODE_ENV || 'development';
 const currentConfig = config[environment];
