@@ -41,15 +41,32 @@ function App() {
       console.log('Full customers response:', customersRes.data, 'Type:', typeof customersRes.data, Array.isArray(customersRes.data));
       console.log('Full projects response:', projectsRes.data, 'Type:', typeof projectsRes.data, Array.isArray(projectsRes.data));
       
+      // Check if responses are objects with data properties
+      console.log('workRequests keys:', Object.keys(workRequestsRes.data));
+      console.log('customers keys:', Object.keys(customersRes.data));
+      console.log('projects keys:', Object.keys(projectsRes.data));
+      
+      // Extract data from responses - handle both array and object responses
+      const workRequestsData = Array.isArray(workRequestsRes.data) ? workRequestsRes.data : 
+        (workRequestsRes.data.data || workRequestsRes.data.workRequests || workRequestsRes.data.results || []);
+      const customersData = Array.isArray(customersRes.data) ? customersRes.data : 
+        (customersRes.data.data || customersRes.data.customers || customersRes.data.results || []);
+      const projectsData = Array.isArray(projectsRes.data) ? projectsRes.data : 
+        (projectsRes.data.data || projectsRes.data.projects || projectsRes.data.results || []);
+      
+      console.log('Extracted workRequests data:', workRequestsData, 'Type:', typeof workRequestsData, Array.isArray(workRequestsData));
+      console.log('Extracted customers data:', customersData, 'Type:', typeof customersData, Array.isArray(customersData));
+      console.log('Extracted projects data:', projectsData, 'Type:', typeof projectsData, Array.isArray(projectsData));
+      
       console.log('Data fetched successfully:', {
-        workRequests: workRequestsRes.data.length,
-        customers: customersRes.data.length,
-        projects: projectsRes.data.length
+        workRequests: workRequestsData.length,
+        customers: customersData.length,
+        projects: projectsData.length
       });
 
-      setWorkRequests(workRequestsRes.data);
-      setCustomers(customersRes.data);
-      setProjects(projectsRes.data);
+      setWorkRequests(workRequestsData);
+      setCustomers(customersData);
+      setProjects(projectsData);
     } catch (error) {
       console.error('Error fetching data:', error);
       console.error('Error details:', {
