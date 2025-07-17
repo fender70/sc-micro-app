@@ -9,7 +9,7 @@ import {
   FiMail, 
   FiPhone, 
   FiSearch,
-
+  FiFolder,
   FiEye,
   FiEdit,
   FiPlus

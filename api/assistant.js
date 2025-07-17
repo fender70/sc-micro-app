@@ -10,6 +10,13 @@ const router = express.Router();
 // Initialize LangGraph bridge
 const langGraphBridge = new LangGraphBridge();
 
+// TODO: For deployment, consider replacing LangGraph with:
+// - OpenAI API directly
+// - Anthropic Claude API
+// - Azure OpenAI
+// - Google Vertex AI
+// This would eliminate Python dependencies and work in serverless environments
+
 // Mock data for demonstration (replace with actual LangGraph agent integration)
 const MOCK_WORK_REQUESTS = [
   {
