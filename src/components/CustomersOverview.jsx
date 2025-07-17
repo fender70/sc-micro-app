@@ -16,7 +16,7 @@ import {
 } from 'react-icons/fi';
 import './CustomersOverview.css';
 
-const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
+const CustomersOverview = ({ customers, workRequests, projects, onRefresh }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -26,30 +26,35 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
   // Calculate customer metrics and analytics
   const customerAnalytics = useMemo(() => {
     const analytics = customers.map(customer => {
-      const customerProjects = workRequests.filter(wr => wr.customer_id === customer.id);
+      const customerWorkRequests = workRequests.filter(wr => wr.customer_id === customer.id);
+      const customerProjects = projects.filter(p => p.customer_id === customer.id);
       
+      const totalWorkRequests = customerWorkRequests.length;
       const totalProjects = customerProjects.length;
-      const completedProjects = customerProjects.filter(p => ['completed', 'shipped'].includes(p.status)).length;
-      const activeProjects = customerProjects.filter(p => ['pending', 'in-progress', 'quoted', 'po-received'].includes(p.status)).length;
+      const completedWorkRequests = customerWorkRequests.filter(wr => ['completed', 'shipped'].includes(wr.status)).length;
+      const completedProjects = customerProjects.filter(p => ['completed'].includes(p.status)).length;
+      const activeWorkRequests = customerWorkRequests.filter(wr => ['pending', 'in-progress', 'quoted', 'po-received'].includes(wr.status)).length;
+      const activeProjects = customerProjects.filter(p => ['planning', 'active'].includes(p.status)).length;
+      const cancelledWorkRequests = customerWorkRequests.filter(wr => wr.status === 'cancelled').length;
       const cancelledProjects = customerProjects.filter(p => p.status === 'cancelled').length;
       
-      const invoicedProjects = customerProjects.filter(p => p.invoice_number && p.invoice_number.trim() !== '').length;
-      const totalRevenue = invoicedProjects; // Count of invoiced projects as proxy for revenue
+      const invoicedWorkRequests = customerWorkRequests.filter(wr => wr.invoice_number && wr.invoice_number.trim() !== '').length;
+      const totalRevenue = invoicedWorkRequests; // Count of invoiced work requests as proxy for revenue
       
-      const avgProjectTime = customerProjects
-        .filter(p => p.target_date && p.created_date)
-        .reduce((acc, p) => {
-          const startDate = new Date(p.created_date);
-          const endDate = new Date(p.target_date);
+      const avgProjectTime = customerWorkRequests
+        .filter(wr => wr.target_date && wr.created_date)
+        .reduce((acc, wr) => {
+          const startDate = new Date(wr.created_date);
+          const endDate = new Date(wr.target_date);
           return acc + (endDate - startDate) / (1000 * 60 * 60 * 24); // days
-        }, 0) / Math.max(completedProjects, 1);
+        }, 0) / Math.max(completedWorkRequests, 1);
 
-      const lastActivity = customerProjects.length > 0 
-        ? new Date(Math.max(...customerProjects.map(p => new Date(p.updated_at || p.created_date))))
+      const lastActivity = customerWorkRequests.length > 0 
+        ? new Date(Math.max(...customerWorkRequests.map(wr => new Date(wr.updated_at || wr.created_date))))
         : new Date();
 
-      const projectTypes = customerProjects.reduce((acc, p) => {
-        const details = (p.description || '').toLowerCase();
+      const projectTypes = customerWorkRequests.reduce((acc, wr) => {
+        const details = (wr.description || '').toLowerCase();
         if (details.includes('wirebond') || details.includes('wire bond')) acc.wirebond++;
         if (details.includes('die attach') || details.includes('dieattach')) acc.dieAttach++;
         if (details.includes('flip chip') || details.includes('flipchip')) acc.flipChip++;
@@ -59,17 +64,21 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
 
       return {
         ...customer,
+        totalWorkRequests,
         totalProjects,
+        completedWorkRequests,
         completedProjects,
+        activeWorkRequests,
         activeProjects,
+        cancelledWorkRequests,
         cancelledProjects,
-        invoicedProjects,
+        invoicedWorkRequests,
         totalRevenue,
         avgProjectTime: Math.round(avgProjectTime),
         lastActivity,
         projectTypes,
-        completionRate: totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0,
-        customerValue: totalProjects * 10 + completedProjects * 5 + invoicedProjects * 3 // Simple scoring
+        completionRate: totalWorkRequests > 0 ? Math.round((completedWorkRequests / totalWorkRequests) * 100) : 0,
+        customerValue: totalWorkRequests * 10 + completedWorkRequests * 5 + invoicedWorkRequests * 3 // Simple scoring
       };
     });
 
@@ -88,7 +97,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
       default:
         return analytics;
     }
-  }, [customers, workRequests, sortBy]);
+  }, [customers, workRequests, projects, sortBy]);
 
   // Filter customers based on search and status
   const filteredCustomers = useMemo(() => {
@@ -109,19 +118,21 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
   // Overall customer metrics
   const overallMetrics = useMemo(() => {
     const totalCustomers = customers.length;
-    const activeCustomers = customerAnalytics.filter(c => c.activeProjects > 0).length;
-    const totalProjects = workRequests.length;
+    const activeCustomers = customerAnalytics.filter(c => c.activeWorkRequests > 0).length;
+    const totalWorkRequests = workRequests.length;
+    const totalProjects = projects.length;
     const totalRevenue = workRequests.filter(wr => wr.invoice_number && wr.invoice_number.trim() !== '').length;
-    const avgProjectsPerCustomer = totalCustomers > 0 ? Math.round(totalProjects / totalCustomers * 10) / 10 : 0;
+    const avgProjectsPerCustomer = totalCustomers > 0 ? Math.round(totalWorkRequests / totalCustomers * 10) / 10 : 0;
 
     return {
       totalCustomers,
       activeCustomers,
+      totalWorkRequests,
       totalProjects,
       totalRevenue,
       avgProjectsPerCustomer
     };
-  }, [customers, workRequests, customerAnalytics]);
+  }, [customers, workRequests, projects, customerAnalytics]);
 
 
 
@@ -166,15 +177,15 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
         <div className="customer-metrics">
           <div className="metric-row">
             <div className="metric">
+              <div className="metric-number">{customer.totalWorkRequests}</div>
+              <div className="metric-label">Work Requests</div>
+            </div>
+            <div className="metric">
               <div className="metric-number">{customer.totalProjects}</div>
-              <div className="metric-label">Total Projects</div>
+              <div className="metric-label">Projects</div>
             </div>
             <div className="metric">
-              <div className="metric-number">{customer.completedProjects}</div>
-              <div className="metric-label">Completed</div>
-            </div>
-            <div className="metric">
-              <div className="metric-number">{customer.activeProjects}</div>
+              <div className="metric-number">{customer.activeWorkRequests}</div>
               <div className="metric-label">Active</div>
             </div>
             <div className="metric">
@@ -298,6 +309,15 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
             <FiCalendar />
           </div>
           <div className="metric-content">
+            <div className="metric-number">{overallMetrics.totalWorkRequests}</div>
+            <div className="metric-label">Total Work Requests</div>
+          </div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-icon">
+            <FiFolder />
+          </div>
+          <div className="metric-content">
             <div className="metric-number">{overallMetrics.totalProjects}</div>
             <div className="metric-label">Total Projects</div>
           </div>
@@ -308,7 +328,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
           </div>
           <div className="metric-content">
             <div className="metric-number">{overallMetrics.totalRevenue}</div>
-            <div className="metric-label">Invoiced Projects</div>
+            <div className="metric-label">Invoiced Work Requests</div>
           </div>
         </div>
         <div className="metric-card">
@@ -317,7 +337,7 @@ const CustomersOverview = ({ customers, workRequests, onRefresh }) => {
           </div>
           <div className="metric-content">
             <div className="metric-number">{overallMetrics.avgProjectsPerCustomer}</div>
-            <div className="metric-label">Avg Projects/Customer</div>
+            <div className="metric-label">Avg Work Requests/Customer</div>
           </div>
         </div>
       </div>

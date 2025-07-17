@@ -220,6 +220,7 @@ function App() {
                 <CustomersOverview 
                   customers={customers}
                   workRequests={workRequests}
+                  projects={projects}
                   onRefresh={fetchData}
                 />
               } 
