@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite",
     "backend": "node server.js",
+    "start": "node server.js",
     "dev:full": "concurrently \"npm run backend\" \"npm run dev\"",
     "test:server": "node test-server.js",
     "build": "vite build",

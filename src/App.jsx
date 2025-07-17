@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
+import { API_ENDPOINTS } from './config.js';
 import Header from './components/Header.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import WorkRequestForm from './components/WorkRequestForm.jsx';
@@ -30,9 +31,9 @@ function App() {
     try {
       console.log('Fetching data from database API...');
       const [workRequestsRes, customersRes, projectsRes] = await Promise.all([
-        axios.get('/api/database/work-requests', { timeout: 5000 }),
-        axios.get('/api/database/customers', { timeout: 5000 }),
-        axios.get('/api/database/projects', { timeout: 5000 })
+        axios.get(API_ENDPOINTS.workRequests, { timeout: 5000 }),
+        axios.get(API_ENDPOINTS.customers, { timeout: 5000 }),
+        axios.get(API_ENDPOINTS.projects, { timeout: 5000 })
       ]);
       
       console.log('Data fetched successfully:', {
@@ -65,7 +66,7 @@ function App() {
 
   const addWorkRequest = async (workRequestData) => {
     try {
-      const response = await axios.post('/api/database/work-requests', workRequestData);
+      const response = await axios.post(API_ENDPOINTS.workRequests, workRequestData);
       setWorkRequests([response.data, ...workRequests]);
       return response.data;
     } catch (error) {
@@ -76,7 +77,7 @@ function App() {
 
   const updateWorkRequest = async (id, workRequestData) => {
     try {
-      const response = await axios.put(`/api/database/work-requests/${id}`, workRequestData);
+      const response = await axios.put(`${API_ENDPOINTS.workRequests}/${id}`, workRequestData);
       setWorkRequests(workRequests.map(wr => 
         wr.id === id ? response.data : wr
       ));
@@ -89,7 +90,7 @@ function App() {
 
   const deleteWorkRequest = async (id) => {
     try {
-      await axios.delete(`/api/database/work-requests/${id}`);
+      await axios.delete(`${API_ENDPOINTS.workRequests}/${id}`);
       setWorkRequests(workRequests.filter(wr => wr.id !== id));
     } catch (error) {
       console.error('Error deleting work request:', error);
@@ -99,7 +100,7 @@ function App() {
 
   const addCustomer = async (customerData) => {
     try {
-      const response = await axios.post('/api/database/customers', customerData);
+      const response = await axios.post(API_ENDPOINTS.customers, customerData);
       setCustomers([...customers, response.data]);
       return response.data;
     } catch (error) {
@@ -110,7 +111,7 @@ function App() {
 
   const updateCustomer = async (id, customerData) => {
     try {
-      const response = await axios.put(`/api/database/customers/${id}`, customerData);
+      const response = await axios.put(`${API_ENDPOINTS.customers}/${id}`, customerData);
       setCustomers(customers.map(c => 
         c.id === id ? response.data : c
       ));
@@ -123,7 +124,7 @@ function App() {
 
   const addProject = async (projectData) => {
     try {
-      const response = await axios.post('/api/database/projects', projectData);
+      const response = await axios.post(API_ENDPOINTS.projects, projectData);
       setProjects([response.data, ...projects]);
       return response.data;
     } catch (error) {
@@ -134,7 +135,7 @@ function App() {
 
   const updateProject = async (id, projectData) => {
     try {
-      const response = await axios.put(`/api/database/projects/${id}`, projectData);
+      const response = await axios.put(`${API_ENDPOINTS.projects}/${id}`, projectData);
       setProjects(projects.map(p => 
         p.id === id ? response.data : p
       ));
@@ -147,7 +148,7 @@ function App() {
 
   const deleteProject = async (id) => {
     try {
-      await axios.delete(`/api/database/projects/${id}`);
+      await axios.delete(`${API_ENDPOINTS.projects}/${id}`);
       setProjects(projects.filter(p => p.id !== id));
     } catch (error) {
       console.error('Error deleting project:', error);
